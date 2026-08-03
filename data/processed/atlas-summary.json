@@ -1,0 +1,214 @@
+{
+  "generatedAt": "2026-07-26T00:44:19.000Z",
+  "totalRecords": 15047,
+  "skippedNoLocation": 21,
+  "skippedNoEvidence": 3,
+  "geocodeSources": {
+    "csv": 0,
+    "city": 13092,
+    "county": 1831,
+    "state": 124
+  },
+  "uniqueAgencies": 7730,
+  "uniqueTechnologies": 12,
+  "uniqueStates": 51,
+  "technologies": [
+    "Automated License Plate Readers",
+    "Body-worn Cameras",
+    "Camera Registry",
+    "Cell-site Simulator",
+    "Drones",
+    "Face Recognition",
+    "Fusion Center",
+    "Gunshot Detection",
+    "Predictive Policing",
+    "Real-Time Crime Center",
+    "Third-party Investigative Platforms",
+    "Video Analytics"
+  ],
+  "states": [
+    "AK",
+    "AL",
+    "AR",
+    "AZ",
+    "CA",
+    "CO",
+    "CT",
+    "DC",
+    "DE",
+    "FL",
+    "GA",
+    "HI",
+    "IA",
+    "ID",
+    "IL",
+    "IN",
+    "KS",
+    "KY",
+    "LA",
+    "MA",
+    "MD",
+    "ME",
+    "MI",
+    "MN",
+    "MO",
+    "MS",
+    "MT",
+    "NC",
+    "ND",
+    "NE",
+    "NH",
+    "NJ",
+    "NM",
+    "NV",
+    "NY",
+    "OH",
+    "OK",
+    "OR",
+    "PA",
+    "RI",
+    "SC",
+    "SD",
+    "TN",
+    "TX",
+    "UT",
+    "VA",
+    "VT",
+    "WA",
+    "WI",
+    "WV",
+    "WY"
+  ],
+  "topTechnologies": [
+    {
+      "label": "Body-worn Cameras",
+      "count": 5452
+    },
+    {
+      "label": "Automated License Plate Readers",
+      "count": 4082
+    },
+    {
+      "label": "Drones",
+      "count": 1803
+    },
+    {
+      "label": "Third-party Investigative Platforms",
+      "count": 1055
+    },
+    {
+      "label": "Face Recognition",
+      "count": 975
+    },
+    {
+      "label": "Camera Registry",
+      "count": 755
+    },
+    {
+      "label": "Gunshot Detection",
+      "count": 243
+    },
+    {
+      "label": "Real-Time Crime Center",
+      "count": 238
+    },
+    {
+      "label": "Predictive Policing",
+      "count": 200
+    },
+    {
+      "label": "Cell-site Simulator",
+      "count": 83
+    }
+  ],
+  "topStates": [
+    {
+      "label": "CA",
+      "count": 1083
+    },
+    {
+      "label": "NJ",
+      "count": 1048
+    },
+    {
+      "label": "FL",
+      "count": 937
+    },
+    {
+      "label": "TX",
+      "count": 903
+    },
+    {
+      "label": "IL",
+      "count": 862
+    },
+    {
+      "label": "OH",
+      "count": 828
+    },
+    {
+      "label": "MI",
+      "count": 717
+    },
+    {
+      "label": "TN",
+      "count": 677
+    },
+    {
+      "label": "MA",
+      "count": 605
+    },
+    {
+      "label": "GA",
+      "count": 531
+    }
+  ],
+  "topVendors": [
+    {
+      "label": "Flock Safety",
+      "count": 2707
+    },
+    {
+      "label": "Axon",
+      "count": 893
+    },
+    {
+      "label": "SoundThinking",
+      "count": 796
+    },
+    {
+      "label": "DJI",
+      "count": 662
+    },
+    {
+      "label": "Idemia",
+      "count": 257
+    },
+    {
+      "label": "Motorola Solutions",
+      "count": 217
+    },
+    {
+      "label": "CRIMEWATCH",
+      "count": 173
+    },
+    {
+      "label": "WatchGuard",
+      "count": 162
+    },
+    {
+      "label": "Fusus",
+      "count": 156
+    },
+    {
+      "label": "LexisNexis",
+      "count": 136
+    }
+  ],
+  "attribution": "Data source: Electronic Frontier Foundation, Atlas of Surveillance (CC BY).",
+  "sourceName": "EFF Atlas of Surveillance",
+  "sourceUrl": "https://www.atlasofsurveillance.org/data-library",
+  "methodologyUrl": "https://www.atlasofsurveillance.org/pages/methodology",
+  "licenseUrl": "https://www.eff.org/copyright",
+  "sourceLastUpdated": "2026-04-08"
+}

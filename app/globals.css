@@ -1,0 +1,144 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background: #05070d;
+  color: #dbe6f2;
+  overscroll-behavior: none;
+}
+
+/* MapLibre canvas should fill its container with no focus ring */
+.maplibregl-canvas:focus {
+  outline: none;
+}
+
+/* Hide default MapLibre attribution chrome; we render our own attribution in the footer. */
+.maplibregl-ctrl-attrib,
+.maplibregl-ctrl-logo {
+  display: none !important;
+}
+
+/* ---- Themed MapLibre popup (overrides the default white bubble) ---- */
+.maplibregl-popup-content {
+  background: rgba(10, 16, 26, 0.92) !important;
+  border: 1px solid rgba(56, 225, 255, 0.35);
+  border-radius: 10px;
+  padding: 10px 12px !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55), 0 0 18px rgba(56, 225, 255, 0.12);
+  backdrop-filter: blur(6px);
+  color: #dbe6f2;
+}
+.maplibregl-popup-tip {
+  border-top-color: rgba(10, 16, 26, 0.92) !important;
+  border-bottom-color: rgba(10, 16, 26, 0.92) !important;
+}
+.sr-popup {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #dbe6f2;
+  min-width: 150px;
+}
+.sr-popup .sr-popup-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.sr-popup .sr-chip {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  box-shadow: 0 0 8px currentColor;
+  flex: none;
+}
+.sr-popup .sr-sub {
+  margin-top: 3px;
+  color: #9fb0c6;
+}
+.sr-popup .sr-attr {
+  margin-top: 4px;
+  color: #5b6a80;
+  font-size: 10px;
+}
+
+/* MapLibre navigation control, retinted to match the HUD. */
+.maplibregl-ctrl-group {
+  background: rgba(11, 15, 24, 0.8) !important;
+  border: 1px solid #1b2433 !important;
+  backdrop-filter: blur(6px);
+}
+.maplibregl-ctrl-group button + button {
+  border-top: 1px solid #1b2433 !important;
+}
+.maplibregl-ctrl button .maplibregl-ctrl-icon {
+  filter: invert(0.85) hue-rotate(160deg) brightness(1.1);
+}
+
+/* ---- Radar sweep overlay (full-scene, rotating conic gradient) ---- */
+.radar-sweep {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 150vmax;
+  height: 150vmax;
+  transform-origin: center;
+  translate: -50% -50%;
+  border-radius: 50%;
+  pointer-events: none;
+  background: conic-gradient(
+    from 0deg,
+    rgba(56, 225, 255, 0) 0deg,
+    rgba(56, 225, 255, 0) 300deg,
+    rgba(56, 225, 255, 0.05) 344deg,
+    rgba(122, 240, 255, 0.16) 358deg,
+    rgba(154, 240, 255, 0.28) 360deg
+  );
+  mix-blend-mode: screen;
+  opacity: 0.7;
+}
+
+/* ---- Faint scope grid + vignette over the whole scene ---- */
+.scope-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 120% at 50% 42%, rgba(5, 7, 13, 0) 42%, rgba(5, 7, 13, 0.55) 100%),
+    radial-gradient(60% 60% at 50% 42%, rgba(63, 143, 214, 0.06) 0%, rgba(5, 7, 13, 0) 70%);
+}
+
+/* HUD corner-tick accent used on panels. */
+.hud-panel {
+  background: linear-gradient(180deg, rgba(15, 21, 33, 0.86) 0%, rgba(9, 13, 21, 0.82) 100%);
+  border: 1px solid #1b2433;
+  box-shadow: inset 0 1px 0 rgba(56, 225, 255, 0.06), 0 8px 30px rgba(0, 0, 0, 0.35);
+}
+.hud-panel::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(56, 225, 255, 0) 0%, rgba(56, 225, 255, 0.5) 50%, rgba(56, 225, 255, 0) 100%);
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #1b2433;
+  border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .radar-sweep {
+    animation: none !important;
+  }
+}

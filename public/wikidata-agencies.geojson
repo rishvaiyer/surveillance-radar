@@ -1,0 +1,19 @@
+{
+  "type": "FeatureCollection",
+  "attribution": "Data from Wikidata (CC0)",
+  "note": "SAMPLE data committed so the layer renders offline. Run `pnpm ingest:wikidata` with network to overwrite with live SPARQL results.",
+  "features": [
+    { "type": "Feature", "properties": { "id": "wd-Q312569", "name": "Federal Bureau of Investigation", "country": "United States of America", "wikidata": "http://www.wikidata.org/entity/Q312569" }, "geometry": { "type": "Point", "coordinates": [-77.0250, 38.8951] } },
+    { "type": "Feature", "properties": { "id": "wd-Q187745", "name": "New York City Police Department", "country": "United States of America", "wikidata": "http://www.wikidata.org/entity/Q187745" }, "geometry": { "type": "Point", "coordinates": [-74.0011, 40.7127] } },
+    { "type": "Feature", "properties": { "id": "wd-Q1424589", "name": "Los Angeles Police Department", "country": "United States of America", "wikidata": "http://www.wikidata.org/entity/Q1424589" }, "geometry": { "type": "Point", "coordinates": [-118.2453, 34.0511] } },
+    { "type": "Feature", "properties": { "id": "wd-Q749808", "name": "Chicago Police Department", "country": "United States of America", "wikidata": "http://www.wikidata.org/entity/Q749808" }, "geometry": { "type": "Point", "coordinates": [-87.6242, 41.8538] } },
+    { "type": "Feature", "properties": { "id": "wd-Q1129670", "name": "Metropolitan Police Department of the District of Columbia", "country": "United States of America", "wikidata": "http://www.wikidata.org/entity/Q1129670" }, "geometry": { "type": "Point", "coordinates": [-77.0186, 38.8921] } },
+    { "type": "Feature", "properties": { "id": "wd-Q3220821", "name": "San Francisco Police Department", "country": "United States of America", "wikidata": "http://www.wikidata.org/entity/Q3220821" }, "geometry": { "type": "Point", "coordinates": [-122.4036, 37.7725] } },
+    { "type": "Feature", "properties": { "id": "wd-Q1419727", "name": "Boston Police Department", "country": "United States of America", "wikidata": "http://www.wikidata.org/entity/Q1419727" }, "geometry": { "type": "Point", "coordinates": [-71.0716, 42.3320] } },
+    { "type": "Feature", "properties": { "id": "wd-Q2728937", "name": "Seattle Police Department", "country": "United States of America", "wikidata": "http://www.wikidata.org/entity/Q2728937" }, "geometry": { "type": "Point", "coordinates": [-122.3315, 47.6097] } },
+    { "type": "Feature", "properties": { "id": "wd-Q1424293", "name": "Houston Police Department", "country": "United States of America", "wikidata": "http://www.wikidata.org/entity/Q1424293" }, "geometry": { "type": "Point", "coordinates": [-95.3677, 29.7589] } },
+    { "type": "Feature", "properties": { "id": "wd-Q3508094", "name": "Atlanta Police Department", "country": "United States of America", "wikidata": "http://www.wikidata.org/entity/Q3508094" }, "geometry": { "type": "Point", "coordinates": [-84.3901, 33.7525] } },
+    { "type": "Feature", "properties": { "id": "wd-Q2304290", "name": "Miami Police Department", "country": "United States of America", "wikidata": "http://www.wikidata.org/entity/Q2304290" }, "geometry": { "type": "Point", "coordinates": [-80.2103, 25.7785] } },
+    { "type": "Feature", "properties": { "id": "wd-Q1186960", "name": "Philadelphia Police Department", "country": "United States of America", "wikidata": "http://www.wikidata.org/entity/Q1186960" }, "geometry": { "type": "Point", "coordinates": [-75.1486, 39.9527] } }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "type": "FeatureCollection",
+  "attribution": "© OpenStreetMap contributors (ODbL)",
+  "note": "SAMPLE data committed so the layer renders offline. Run `pnpm ingest:osm` with network to overwrite with live Overpass results.",
+  "bbox": { "south": 38.79, "west": -77.12, "north": 38.996, "east": -76.91 },
+  "features": [
+    { "type": "Feature", "properties": { "id": "osm-sample-1", "surveillanceType": "camera", "operator": "City of Washington", "description": "Traffic monitoring camera" }, "geometry": { "type": "Point", "coordinates": [-77.0366, 38.8977] } },
+    { "type": "Feature", "properties": { "id": "osm-sample-2", "surveillanceType": "camera", "operator": "", "description": "Public space CCTV" }, "geometry": { "type": "Point", "coordinates": [-77.0091, 38.8899] } },
+    { "type": "Feature", "properties": { "id": "osm-sample-3", "surveillanceType": "ALPR", "operator": "Metropolitan Police", "description": "Automated license plate reader" }, "geometry": { "type": "Point", "coordinates": [-77.0214, 38.9072] } },
+    { "type": "Feature", "properties": { "id": "osm-sample-4", "surveillanceType": "camera", "operator": "", "description": "Dome camera" }, "geometry": { "type": "Point", "coordinates": [-77.0502, 38.8810] } },
+    { "type": "Feature", "properties": { "id": "osm-sample-5", "surveillanceType": "camera", "operator": "Metro Transit", "description": "Station platform camera" }, "geometry": { "type": "Point", "coordinates": [-77.0281, 38.8983] } },
+    { "type": "Feature", "properties": { "id": "osm-sample-6", "surveillanceType": "camera", "operator": "", "description": "Fixed surveillance camera" }, "geometry": { "type": "Point", "coordinates": [-76.9956, 38.8893] } },
+    { "type": "Feature", "properties": { "id": "osm-sample-7", "surveillanceType": "ALPR", "operator": "", "description": "License plate reader on overpass" }, "geometry": { "type": "Point", "coordinates": [-77.0731, 38.9101] } },
+    { "type": "Feature", "properties": { "id": "osm-sample-8", "surveillanceType": "camera", "operator": "National Park Service", "description": "Monument area camera" }, "geometry": { "type": "Point", "coordinates": [-77.0353, 38.8895] } },
+    { "type": "Feature", "properties": { "id": "osm-sample-9", "surveillanceType": "camera", "operator": "", "description": "Intersection camera" }, "geometry": { "type": "Point", "coordinates": [-77.0164, 38.9203] } },
+    { "type": "Feature", "properties": { "id": "osm-sample-10", "surveillanceType": "camera", "operator": "", "description": "Building entrance camera" }, "geometry": { "type": "Point", "coordinates": [-77.0589, 38.9048] } },
+    { "type": "Feature", "properties": { "id": "osm-sample-11", "surveillanceType": "camera", "operator": "Metro Transit", "description": "Bus depot camera" }, "geometry": { "type": "Point", "coordinates": [-76.9847, 38.9265] } },
+    { "type": "Feature", "properties": { "id": "osm-sample-12", "surveillanceType": "ALPR", "operator": "Metropolitan Police", "description": "ALPR camera array" }, "geometry": { "type": "Point", "coordinates": [-77.0911, 38.8451] } }
+  ]
+}
