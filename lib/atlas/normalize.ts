@@ -33,6 +33,10 @@ const SOURCE_ALIASES = [
   "evidence",
 ];
 
+// Header names that may hold a date for one of the evidence links. Used to
+// estimate the earliest year a record was documented (for the time slider).
+const DATE_ALIASES = ["link 1 date", "link 2 date", "link 3 date", "date"];
+
 function buildHeaderMap(headers: string[]): Map<string, string> {
   // normalized header -> original header
   const map = new Map<string, string>();
@@ -75,6 +79,31 @@ function toNumber(v: string | null): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+// Pulls a plausible 19xx/20xx year out of a free-form date string (the CSV's
+// link-date columns are US-format like "12/27/2012"). Returns null if none found.
+function extractYear(dateStr: string): number | null {
+  const m = dateStr.match(/(19|20)\d{2}/);
+  if (!m) return null;
+  const year = Number(m[0]);
+  return Number.isFinite(year) ? year : null;
+}
+
+// Earliest (minimum) year across all dated evidence links on the row, used as
+// a "known by" year for the time slider. A record can have no dated links at
+// all (older entries, or links whose date wasn't captured upstream).
+function earliestSourceYear(row: RawRow, headerMap: Map<string, string>): number | null {
+  let earliest: number | null = null;
+  for (const alias of DATE_ALIASES) {
+    const original = headerMap.get(alias);
+    if (original === undefined) continue;
+    const v = row[original];
+    if (v == null || String(v).trim() === "") continue;
+    const year = extractYear(String(v));
+    if (year != null && (earliest == null || year < earliest)) earliest = year;
+  }
+  return earliest;
+}
+
 export type NormalizedRow = {
   sourceRecordId: string | null;
   agencyName: string | null;
@@ -87,6 +116,7 @@ export type NormalizedRow = {
   sourceUrls: string[];
   csvLat: number | null;
   csvLng: number | null;
+  earliestSourceYear: number | null;
   raw: Record<string, string | null>;
 };
 
@@ -104,6 +134,7 @@ export function normalizeRow(row: RawRow, headers: string[]): NormalizedRow {
     sourceUrls: collectSources(row, headerMap),
     csvLat: toNumber(pick(row, headerMap, FIELD_ALIASES.latitude)),
     csvLng: toNumber(pick(row, headerMap, FIELD_ALIASES.longitude)),
+    earliestSourceYear: earliestSourceYear(row, headerMap),
     raw: Object.fromEntries(Object.entries(row).map(([k, v]) => [k, v == null ? null : String(v)])),
   };
 }

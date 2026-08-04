@@ -103,9 +103,9 @@ export default function Controls({
         EFF ALPR reports (2016–2017)
       </label>
 
-      {(filters.query || filters.state || filters.technology || filters.sourcesOnly || filters.alprEvidenceOnly) && (
+      {(filters.query || filters.state || filters.technology || filters.sourcesOnly || filters.alprEvidenceOnly || filters.year != null) && (
         <button
-          onClick={() => onChange({ query: "", state: null, technology: null, sourcesOnly: false, alprEvidenceOnly: false })}
+          onClick={() => onChange({ query: "", state: null, technology: null, sourcesOnly: false, alprEvidenceOnly: false, year: null })}
           className="mt-3 font-mono text-[10px] uppercase tracking-wide text-muted underline-offset-2 hover:text-signal hover:underline"
         >
           Clear filters

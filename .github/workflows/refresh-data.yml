@@ -42,3 +42,44 @@ jobs:
           git add data public/atlas-records.json public/eff-data-driven-alpr.json public/osm-surveillance.geojson public/wikidata-agencies.geojson
           git diff --cached --quiet || git commit -m "Refresh surveillance data (weekly)"
           git push
+
+  # On-demand static export, so the demo can be rebuilt without a local Node
+  # install. Manual only (workflow_dispatch) — the weekly cron just refreshes
+  # data and stops there, matching this job's `if:` below — and always after
+  # `ingest`, so the export picks up whatever data that job just committed.
+  build:
+    needs: ingest
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      # No `ref` pin: this checks out github.ref (the branch), which by now
+      # points at the commit `ingest` just pushed, not the older commit that
+      # triggered the run.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build static export
+        # next.config.js sets output: "export", so `next build` (the "build"
+        # script) writes the static site straight to out/ — no separate
+        # `next export` step.
+        run: pnpm build
+
+      - name: Upload static export
+        uses: actions/upload-artifact@v4
+        with:
+          name: radar-static-export
+          path: out/
+          retention-days: 7

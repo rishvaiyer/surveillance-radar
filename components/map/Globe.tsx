@@ -5,6 +5,7 @@ import maplibregl, { type GeoJSONSource, type Map as MLMap } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { THEME, techColor, techColorMatchExpression } from "../../lib/atlas/theme";
 import type { MapRecord } from "../../lib/atlas/schema";
+import type { ClickedCountry } from "../../lib/geo/countryLookup";
 
 // Dark globe style. Land outlines come from a bundled GeoJSON — fully self-contained,
 // no tile server, no API keys.
@@ -57,11 +58,13 @@ export default function Globe({
   onSelect,
   showOsm,
   showWikidata,
+  onCountryClick,
 }: {
   records: MapRecord[];
   onSelect: (records: MapRecord[]) => void;
   showOsm: boolean;
   showWikidata: boolean;
+  onCountryClick: (country: ClickedCountry) => void;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MLMap | null>(null);
@@ -238,6 +241,7 @@ export default function Globe({
 
       wireInteractions(map);
       wireExtraInteractions(map);
+      wireCountryInteraction(map);
       setReady(true);
     });
 
@@ -354,6 +358,30 @@ export default function Globe({
       );
     });
     map.on("mouseleave", "wikidata-core", hide);
+  }
+
+  // Click a country's landmass (the "land" fill layer, from world.geojson) to
+  // open the country/region breakdown panel. Data-point clicks take priority:
+  // if the click also hit a cluster or a record point, this bails so it
+  // doesn't fight with wireInteractions()'s own click handlers on those layers.
+  function wireCountryInteraction(map: MLMap) {
+    map.on("mouseenter", "land", () => {
+      if (map.getCanvas().style.cursor === "") map.getCanvas().style.cursor = "pointer";
+    });
+    map.on("mouseleave", "land", () => {
+      map.getCanvas().style.cursor = "";
+    });
+
+    map.on("click", "land", (e) => {
+      const dataHit = map.queryRenderedFeatures(e.point, { layers: ["clusters", "point-core"] });
+      if (dataHit.length > 0) return;
+      const f = e.features?.[0];
+      if (!f || !f.geometry) return;
+      const props = (f.properties ?? {}) as Record<string, unknown>;
+      const name = (props.ADMIN || props.NAME || props.NAME_EN || "Unknown") as string;
+      const iso2 = typeof props.ISO_A2 === "string" ? props.ISO_A2 : null;
+      onCountryClick({ name, iso2, geometry: f.geometry as any });
+    });
   }
 
   // Toggle visibility of the additional layers when the props change.

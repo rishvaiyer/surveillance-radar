@@ -143,6 +143,7 @@ async function main() {
   const records: SurveillanceRecord[] = [];
   let skippedNoLocation = 0;
   let skippedNoEvidence = 0;
+  let recordsWithYear = 0;
   const techCounts = new Map<string, number>();
   const stateCounts = new Map<string, number>();
   const vendorCounts = new Map<string, number>();
@@ -190,6 +191,7 @@ async function main() {
       latitude: lat,
       longitude: lng,
       geocodeSource,
+      earliestSourceYear: n.earliestSourceYear,
       // raw intentionally dropped from the client payload
     };
 
@@ -201,6 +203,7 @@ async function main() {
     if (record.state) stateCounts.set(record.state, (stateCounts.get(record.state) ?? 0) + 1);
     if (record.vendor) vendorCounts.set(record.vendor, (vendorCounts.get(record.vendor) ?? 0) + 1);
     if (record.agencyName) agencies.add(record.agencyName);
+    if (record.earliestSourceYear != null) recordsWithYear += 1;
   });
 
   const summary = {
@@ -212,6 +215,11 @@ async function main() {
     uniqueAgencies: agencies.size,
     uniqueTechnologies: techCounts.size,
     uniqueStates: stateCounts.size,
+    // Coverage of the "known by year" field baked for the time slider (earliest
+    // dated evidence link per record). The app also recomputes this at runtime
+    // from the fetched records so the slider's caveat text is never stale.
+    recordsWithYear,
+    yearCoveragePct: records.length > 0 ? Math.round((recordsWithYear / records.length) * 1000) / 10 : 0,
     technologies: [...techCounts.keys()].sort(),
     states: [...stateCounts.keys()].sort(),
     topTechnologies: topN(techCounts, 10),
@@ -244,6 +252,7 @@ async function main() {
   console.log(`  unique agencies:     ${summary.uniqueAgencies}`);
   console.log(`  unique technologies: ${summary.uniqueTechnologies}`);
   console.log(`  unique states:       ${summary.uniqueStates}`);
+  console.log(`  records with year:   ${summary.recordsWithYear} (${summary.yearCoveragePct}%)`);
   console.log(
     `\nWrote ${path.relative(ROOT, OUT_RECORDS)}, ${path.relative(ROOT, PUBLIC_RECORDS)} and ${path.relative(ROOT, OUT_SUMMARY)}\n`
   );

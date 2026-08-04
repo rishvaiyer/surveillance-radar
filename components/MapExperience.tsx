@@ -11,8 +11,11 @@ import Footer from "./layout/Footer";
 import RecordList from "./map/RecordList";
 import AlprNetwork from "./map/AlprNetwork";
 import LayerToggles from "./map/LayerToggles";
+import TimeSlider from "./map/TimeSlider";
+import CountryPanel from "./map/CountryPanel";
 import { applyFilters, EMPTY_FILTERS, type Filters } from "../lib/atlas/filters";
 import type { MapRecord } from "../lib/atlas/schema";
+import type { ClickedCountry } from "../lib/geo/countryLookup";
 
 type Summary = {
   totalRecords: number;
@@ -33,6 +36,14 @@ type AlprRecord = NonNullable<MapRecord["alprEvidence"]> & {
   state: string | null;
 };
 
+// Minimal shape needed by CountryPanel for the OSM / Wikidata point layers
+// (fetched separately here purely for the country breakdown panel; Globe.tsx
+// loads these same files itself for rendering, via its own MapLibre sources).
+type PointFeature = {
+  properties: Record<string, unknown>;
+  geometry: { type: string; coordinates: [number, number] };
+};
+
 export default function MapExperience({
   summary,
 }: {
@@ -47,8 +58,16 @@ export default function MapExperience({
   const [networkView, setNetworkView] = useState(false);
   const [showOsm, setShowOsm] = useState(false);
   const [showWikidata, setShowWikidata] = useState(false);
+  // Country/region breakdown panel (opened by clicking a country on the globe).
+  const [selectedCountry, setSelectedCountry] = useState<ClickedCountry | null>(null);
+  const [osmFeatures, setOsmFeatures] = useState<PointFeature[]>([]);
+  const [wikidataFeatures, setWikidataFeatures] = useState<PointFeature[]>([]);
 
   const filtered = useMemo(() => applyFilters(records, filters), [records, filters]);
+  const yearCoverage = useMemo(() => {
+    const withYear = records.filter((r) => r.earliestSourceYear != null).length;
+    return { withYear, total: records.length };
+  }, [records]);
 
   useEffect(() => {
     let active = true;
@@ -91,6 +110,32 @@ export default function MapExperience({
     };
   }, []);
 
+  // Fetched separately (and non-fatally) from the atlas/ALPR load above: these
+  // two only feed the country breakdown panel, so a failure here shouldn't
+  // block the main map. Globe.tsx loads the same two files itself, directly
+  // into MapLibre GeoJSON sources, for rendering the OSM/Wikidata layers.
+  useEffect(() => {
+    let active = true;
+    const base = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
+    Promise.all([
+      fetch(`${base}/osm-surveillance.geojson`).then((r) => (r.ok ? r.json() : null)),
+      fetch(`${base}/wikidata-agencies.geojson`).then((r) => (r.ok ? r.json() : null)),
+    ])
+      .then(([osm, wikidata]) => {
+        if (!active) return;
+        if (osm?.features) setOsmFeatures(osm.features);
+        if (wikidata?.features) setWikidataFeatures(wikidata.features);
+      })
+      .catch(() => {
+        // Non-fatal: the country panel just reports 0 for these layers.
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   useEffect(() => {
     if (records.length === 0) return;
     const id = new URLSearchParams(window.location.search).get("record");
@@ -100,6 +145,7 @@ export default function MapExperience({
   }, [records]);
 
   const selectRecords = (next: MapRecord[] | null) => {
+    if (next) setSelectedCountry(null); // the two side panels are mutually exclusive
     setSelected(next);
     const url = new URL(window.location.href);
     if (next?.length === 1) url.searchParams.set("record", next[0].id);
@@ -107,10 +153,21 @@ export default function MapExperience({
     window.history.replaceState({}, "", url);
   };
 
+  const handleCountryClick = (country: ClickedCountry) => {
+    selectRecords(null); // close the record drawer (and its ?record= param) first
+    setSelectedCountry(country);
+  };
+
   return (
     <main className="relative h-screen w-screen overflow-hidden bg-space">
       {/* The globe (base layer) */}
-      <Globe records={filtered} onSelect={selectRecords} showOsm={showOsm} showWikidata={showWikidata} />
+      <Globe
+        records={filtered}
+        onSelect={selectRecords}
+        showOsm={showOsm}
+        showWikidata={showWikidata}
+        onCountryClick={handleCountryClick}
+      />
 
       {/* Atmospheric overlays: stars, rotating radar sweep, scope vignette (above the
           globe, below the UI panels). */}
@@ -187,6 +244,18 @@ export default function MapExperience({
 
       {listView && <RecordList records={filtered} onSelect={(record) => selectRecords([record])} />}
 
+      {/* Time slider: filters the atlas layer to records known by a given year.
+          Hidden in the list/network views, which have their own bottom-anchored
+          panels that would collide with it on narrow screens. */}
+      {!listView && !networkView && (
+        <TimeSlider
+          value={filters.year}
+          onChange={(year) => setFilters((f) => ({ ...f, year }))}
+          recordsWithYear={yearCoverage.withYear}
+          totalRecords={yearCoverage.total}
+        />
+      )}
+
       {/* Technology color key (doubles as a quick filter) */}
       <div className="hidden md:block">
         <Legend
@@ -198,6 +267,16 @@ export default function MapExperience({
 
       {/* Detail drawer */}
       <RecordDrawer records={selected} onClose={() => selectRecords(null)} />
+
+      {/* Country/region breakdown panel (mutually exclusive with the record drawer above) */}
+      <CountryPanel
+        country={selectedCountry}
+        onClose={() => setSelectedCountry(null)}
+        atlasRecords={records}
+        osmFeatures={osmFeatures}
+        wikidataFeatures={wikidataFeatures}
+        onSelectState={(state) => setFilters((f) => ({ ...f, state }))}
+      />
 
       <Footer summary={summary} />
 

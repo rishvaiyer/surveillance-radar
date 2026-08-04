@@ -17,6 +17,11 @@ export const SurveillanceRecordSchema = z.object({
   longitude: z.number().nullable(),
   // How the coordinates were resolved: from the CSV directly, or which centroid fallback.
   geocodeSource: z.enum(["csv", "city", "county", "state", "none"]).default("none"),
+  // Earliest year found across the record's dated evidence links (used by the
+  // time slider). `.optional()` because records committed before this field
+  // existed won't have it until the next ingest run; treat missing the same
+  // as null (no usable year).
+  earliestSourceYear: z.number().nullable().optional(),
   raw: z.record(z.string(), z.string().nullable()).optional(),
   alprEvidence: z.object({
     directSharing: z.number().nullable(),
