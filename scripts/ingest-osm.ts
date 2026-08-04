@@ -420,12 +420,23 @@ async function main() {
     : (console.warn("  (ALPR sweep failed — carrying over committed ALPR features)"),
       committedFeatures("alpr"));
 
-  // De-duplicate by OSM id: an ALPR node inside a curated region satisfies both
-  // sweeps. ALPR wins, since it is the more specific classification.
+  // De-duplicate by OSM id. Two sources of duplicates: an ALPR node inside a
+  // curated region satisfies both sweeps, and a node sitting exactly on an
+  // internal tile boundary is returned for both adjacent tiles (Overpass bbox
+  // edges are inclusive). ALPR wins, since it is the more specific
+  // classification.
   const byId = new Map<string, Feature>();
   for (const f of camera) byId.set(f.properties.id as string, f);
   for (const f of alpr) byId.set(f.properties.id as string, f);
   const features = [...byId.values()];
+
+  // Count the features actually written, not the pre-dedupe totals — this file
+  // is meant to be auditable, so its own counts have to match its contents.
+  const finalCounts = { camera: 0, alpr: 0 };
+  for (const f of features) {
+    if (f.properties.category === "alpr") finalCounts.alpr++;
+    else finalCounts.camera++;
+  }
 
   const fc = {
     type: "FeatureCollection" as const,
@@ -440,8 +451,9 @@ async function main() {
       "downsampled. Both are samples — absence reflects mapping coverage and sampling, not " +
       "absence of cameras.",
     counts: {
-      camera: camera.length,
-      alpr: alpr.length,
+      camera: finalCounts.camera,
+      alpr: finalCounts.alpr,
+      duplicatesRemoved: camera.length + alpr.length - features.length,
       alprFetchedBeforeDownsample: alprFresh ? alprFresh.length : null,
       alprWorldwideTotalObserved: 135358, // Overpass `out count`, 2026-08-04
     },
@@ -452,8 +464,8 @@ async function main() {
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
   fs.writeFileSync(OUT, JSON.stringify(fc));
   console.log(
-    `\nWrote ${features.length} OSM nodes (${camera.length} camera across ${regions.length} regions, ` +
-      `${alpr.length} ALPR worldwide) to ${path.relative(ROOT, OUT)}\n`
+    `\nWrote ${features.length} OSM nodes (${finalCounts.camera} camera across ${regions.length} regions, ` +
+      `${finalCounts.alpr} ALPR worldwide) to ${path.relative(ROOT, OUT)}\n`
   );
 }
 
