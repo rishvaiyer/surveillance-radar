@@ -139,7 +139,9 @@ function regionForPoint(lat: number, lon: number): string {
   return "unknown";
 }
 
-async function fetchOnce(url: string): Promise<Feature[] | null> {
+// Resolves to the parsed feature list (possibly empty) or throws. It never
+// resolves to null — the caller distinguishes "empty" from "failed" itself.
+async function fetchOnce(url: string): Promise<Feature[]> {
   const body = `data=${encodeURIComponent(overpassQuery())}`;
   const res = await fetch(url, {
     method: "POST",
