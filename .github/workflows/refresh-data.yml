@@ -76,6 +76,12 @@ jobs:
         # script) writes the static site straight to out/ — no separate
         # `next export` step.
         run: pnpm build
+        env:
+          # The portfolio serves this export from https://rishiyer.up.railway.app/radar/,
+          # so build it with that base path. next.config.js feeds this into both
+          # basePath/assetPrefix and every runtime data fetch, which makes the
+          # artifact drop-in deployable with no path rewriting afterwards.
+          NEXT_PUBLIC_BASE_PATH: /radar
 
       - name: Upload static export
         uses: actions/upload-artifact@v4
