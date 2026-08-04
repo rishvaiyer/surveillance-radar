@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-04T00:16:46.857Z",
+  "generatedAt": "2026-08-04T00:32:48.649Z",
   "totalRecords": 15047,
   "skippedNoLocation": 21,
   "skippedNoEvidence": 3,
@@ -12,6 +12,8 @@
   "uniqueAgencies": 7730,
   "uniqueTechnologies": 12,
   "uniqueStates": 51,
+  "recordsWithYear": 14039,
+  "yearCoveragePct": 93.3,
   "technologies": [
     "Automated License Plate Readers",
     "Body-worn Cameras",
