@@ -133,7 +133,9 @@ type Feature = {
   geometry: { type: "Point"; coordinates: [number, number] };
 };
 
-const STATES = centroids.states as Record<string, [number, number]>;
+// The JSON import infers each centroid as number[], not a 2-tuple, so this
+// needs the double assertion to land on [lat, lon].
+const STATES = centroids.states as unknown as Record<string, [number, number]>;
 
 function body(vendor: string, page: number) {
   return JSON.stringify({

@@ -54,8 +54,13 @@ import path from "node:path";
 const ROOT = path.resolve(__dirname, "..");
 const OUT = path.join(ROOT, "public/osm-surveillance.geojson");
 
-const REQUEST_TIMEOUT_MS = Number(process.env.SR_OSM_REQUEST_TIMEOUT_MS || 90_000);
-const TOTAL_BUDGET_MS = Number(process.env.SR_OSM_TOTAL_BUDGET_MS || 300_000);
+// The client abort must be >= the [timeout:N] the query itself asks Overpass
+// for, or we hang up before the server can answer and every attempt "fails"
+// on a query that was actually still running. The region sweep asks for 120s,
+// the ALPR sweeps for 180s, hence the two values below.
+const REQUEST_TIMEOUT_MS = Number(process.env.SR_OSM_REQUEST_TIMEOUT_MS || 150_000);
+const ALPR_REQUEST_TIMEOUT_MS = Number(process.env.SR_OSM_ALPR_REQUEST_TIMEOUT_MS || 210_000);
+const TOTAL_BUDGET_MS = Number(process.env.SR_OSM_TOTAL_BUDGET_MS || 900_000);
 const START = Date.now();
 
 const OVERPASS_ENDPOINTS = [
@@ -182,13 +187,13 @@ function regionQuery(): string {
 }
 
 // Sweep B query: one named set per ALPR tile, tag-filtered so the worldwide
-// extent stays tractable.
-function alprQuery(): string {
-  const lines = ["[out:json][timeout:240];"];
-  const tiles = [
-    ...usTiles().map((bbox) => ({ bbox, cap: US_TILE_CAP })),
-    ...WORLD_TILES.map((bbox) => ({ bbox, cap: WORLD_TILE_CAP })),
-  ];
+// extent stays tractable. Built per tile-group rather than as one request —
+// the U.S. grid and the world tiles go separately, for the same reason
+// ingest-wikidata.ts splits its two classes: a smaller request is markedly
+// more likely to complete against a busy shared endpoint, and one half failing
+// still leaves the other half's data.
+function alprQuery(tiles: { bbox: BBox; cap: number }[]): string {
+  const lines = ["[out:json][timeout:180];"];
   tiles.forEach(({ bbox, cap }, i) => {
     const [south, west, north, east] = bbox;
     const set = `.a${i}`;
@@ -269,13 +274,18 @@ function downsampleSpatially(features: Feature[], cap: number): Feature[] {
 
 // Resolves to the parsed feature list (possibly empty) or throws. It never
 // resolves to null — the caller distinguishes "empty" from "failed" itself.
-async function fetchOnce(url: string, query: string, category: string): Promise<Feature[]> {
+async function fetchOnce(
+  url: string,
+  query: string,
+  category: string,
+  timeoutMs: number
+): Promise<Feature[]> {
   const body = `data=${encodeURIComponent(query)}`;
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded", "User-Agent": USER_AGENT },
     body,
-    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    signal: AbortSignal.timeout(timeoutMs),
   });
   if (!res.ok) throw new Error(`HTTP ${res.status} from ${url}`);
   // A busy Overpass instance answers 200 with an HTML error document rather
@@ -300,14 +310,19 @@ async function fetchOnce(url: string, query: string, category: string): Promise<
 
 // One retry per endpoint (network hiccups are common against the shared
 // public Overpass instance); then fall through to the mirror endpoint.
-async function tryEndpoint(url: string, query: string, category: string): Promise<Feature[] | null> {
+async function tryEndpoint(
+  url: string,
+  query: string,
+  category: string,
+  timeoutMs: number
+): Promise<Feature[] | null> {
   for (let attempt = 1; attempt <= 2; attempt++) {
     if (Date.now() - START > TOTAL_BUDGET_MS) {
       console.warn("  (time budget reached — stopping Overpass attempts)");
       return null;
     }
     try {
-      const features = await fetchOnce(url, query, category);
+      const features = await fetchOnce(url, query, category, timeoutMs);
       if (features.length > 0) return features;
       console.warn(`  (${url} returned 0 features on attempt ${attempt})`);
     } catch (err) {
@@ -318,14 +333,39 @@ async function tryEndpoint(url: string, query: string, category: string): Promis
   return null;
 }
 
-async function sweep(label: string, query: string, category: string): Promise<Feature[] | null> {
+async function sweep(
+  label: string,
+  query: string,
+  category: string,
+  timeoutMs = REQUEST_TIMEOUT_MS
+): Promise<Feature[] | null> {
   console.log(`\n  sweep: ${label}`);
   for (const url of OVERPASS_ENDPOINTS) {
     if (Date.now() - START > TOTAL_BUDGET_MS) break;
-    const features = await tryEndpoint(url, query, category);
+    const features = await tryEndpoint(url, query, category, timeoutMs);
     if (features) return features;
   }
   return null;
+}
+
+// The ALPR sweep runs as two requests (U.S. grid, then the rest of the world).
+// Either half succeeding counts as a success; only both failing falls back to
+// the committed features.
+async function alprSweep(): Promise<Feature[] | null> {
+  const us = await sweep(
+    "surveillance:type=ALPR (U.S. grid)",
+    alprQuery(usTiles().map((bbox) => ({ bbox, cap: US_TILE_CAP }))),
+    "alpr",
+    ALPR_REQUEST_TIMEOUT_MS
+  );
+  const world = await sweep(
+    "surveillance:type=ALPR (rest of world)",
+    alprQuery(WORLD_TILES.map((bbox) => ({ bbox, cap: WORLD_TILE_CAP }))),
+    "alpr",
+    ALPR_REQUEST_TIMEOUT_MS
+  );
+  if (!us && !world) return null;
+  return [...(us ?? []), ...(world ?? [])];
 }
 
 // Features of one category carried over from the committed file, used when
@@ -354,7 +394,7 @@ async function main() {
   console.log(`  budget ${TOTAL_BUDGET_MS}ms`);
 
   const cameraFresh = await sweep("man_made=surveillance (curated regions)", regionQuery(), "camera");
-  const alprFresh = await sweep("surveillance:type=ALPR (worldwide tiles)", alprQuery(), "alpr");
+  const alprFresh = await alprSweep();
 
   if (!cameraFresh && !alprFresh) {
     if (fs.existsSync(OUT)) {
