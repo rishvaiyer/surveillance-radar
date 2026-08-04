@@ -194,12 +194,12 @@ export default function MapExperience({
             </span>
               Surveillance Radar
             </span>
-            <span className="hidden font-mono text-[11px] text-muted lg:inline">
+            <span className="hidden font-mono text-[12px] text-muted lg:inline">
               Documented law-enforcement surveillance · EFF Atlas of Surveillance
             </span>
           </div>
-          <a href="/" className="mt-1 inline-block font-mono text-[10px] text-muted hover:text-signal hover:underline">
-            Built by unevil-warden · Rishva Iyer · Back to portfolio
+          <a href="/" className="mt-1 inline-block font-mono text-[12px] text-muted hover:text-signal hover:underline">
+            Built by Rish Iyer · Back to portfolio
           </a>
         </div>
         <div className="hidden sm:block">
@@ -210,7 +210,7 @@ export default function MapExperience({
       {dataState !== "ready" && (
         <div
           role={dataState === "error" ? "alert" : "status"}
-          className="hud-panel pointer-events-none absolute left-1/2 top-24 z-30 -translate-x-1/2 rounded-lg px-4 py-2 font-mono text-[11px] text-signal backdrop-blur"
+          className="hud-panel pointer-events-none absolute left-1/2 top-24 z-30 -translate-x-1/2 rounded-lg px-4 py-2 font-mono text-[12px] text-signal backdrop-blur"
         >
           {dataState === "loading" ? "Loading documented signals…" : "Signal data could not load. Refresh to retry."}
         </div>

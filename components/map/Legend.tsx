@@ -20,7 +20,7 @@ export default function Legend({
     <div className="hud-panel pointer-events-auto absolute bottom-16 left-4 z-20 w-56 rounded-xl p-3 backdrop-blur">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between font-mono text-[10px] uppercase tracking-[0.14em] text-muted hover:text-signal"
+        className="flex w-full items-center justify-between font-mono text-[12px] uppercase tracking-[0.14em] text-muted hover:text-signal"
       >
         <span>Technology</span>
         <span aria-hidden>{open ? "–" : "+"}</span>
@@ -35,7 +35,7 @@ export default function Legend({
               <li key={t}>
                 <button
                   onClick={() => onPick(isActive ? null : t)}
-                  className={`flex w-full items-center gap-2 rounded px-1.5 py-1 text-left text-[11px] transition ${
+                  className={`flex w-full items-center gap-2 rounded px-1.5 py-1 text-left text-[12px] transition ${
                     isActive ? "bg-signal/10 text-ink" : "text-ink-2 hover:bg-white/5"
                   } ${active && !isActive ? "opacity-45" : ""}`}
                 >

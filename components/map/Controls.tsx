@@ -26,7 +26,7 @@ export default function Controls({
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const set = (patch: Partial<Filters>) => onChange({ ...filters, ...patch });
-  const label = "mt-3 block font-mono text-[10px] uppercase tracking-[0.14em] text-muted";
+  const label = "mt-3 block font-mono text-[12px] uppercase tracking-[0.14em] text-muted";
   const field =
     "mt-1 w-full rounded-md border border-edge bg-space/70 px-2 py-1.5 text-sm text-ink focus:border-signal focus:outline-none";
 
@@ -42,7 +42,7 @@ export default function Controls({
       </button>
       <div className={`hud-panel absolute left-4 z-30 max-h-[calc(100vh-11rem)] w-[calc(100vw-2rem)] max-w-64 overflow-y-auto rounded-xl p-4 backdrop-blur sm:top-24 ${networkView ? "top-56" : "top-32"} ${mobileOpen ? "block" : "hidden sm:block"}`}>
       <div className="mb-2 flex items-center justify-between">
-        <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">Filter signals</div>
+        <div className="font-mono text-[12px] uppercase tracking-[0.14em] text-muted">Filter signals</div>
         <button type="button" onClick={() => setMobileOpen(false)} className="text-xs text-muted sm:hidden">Done</button>
       </div>
       <div aria-live="polite" className="mb-2 text-xs text-signal">
@@ -106,7 +106,7 @@ export default function Controls({
       {(filters.query || filters.state || filters.technology || filters.sourcesOnly || filters.alprEvidenceOnly || filters.year != null) && (
         <button
           onClick={() => onChange({ query: "", state: null, technology: null, sourcesOnly: false, alprEvidenceOnly: false, year: null })}
-          className="mt-3 font-mono text-[10px] uppercase tracking-wide text-muted underline-offset-2 hover:text-signal hover:underline"
+          className="mt-3 font-mono text-[12px] uppercase tracking-wide text-muted underline-offset-2 hover:text-signal hover:underline"
         >
           Clear filters
         </button>

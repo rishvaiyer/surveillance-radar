@@ -79,7 +79,7 @@ export default function TimeSlider({
         </button>
 
         <div className="flex-1">
-          <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+          <div className="flex items-center justify-between font-mono text-[12px] uppercase tracking-[0.14em] text-muted">
             <span>Known by</span>
             <span className="text-signal">{label}</span>
           </div>
@@ -100,7 +100,7 @@ export default function TimeSlider({
         </div>
       </div>
 
-      <p className={`mt-2 text-[10px] leading-relaxed ${sparse ? "text-amber-300" : "text-faint"}`}>
+      <p className={`mt-2 text-[12px] leading-relaxed ${sparse ? "text-amber-300" : "text-faint"}`}>
         {recordsWithYear.toLocaleString()} of {totalRecords.toLocaleString()} records ({coveragePct.toFixed(1)}%) carry a
         documented year (earliest evidence-link date).{" "}
         {sparse

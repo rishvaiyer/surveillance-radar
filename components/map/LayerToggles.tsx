@@ -26,7 +26,7 @@ export default function LayerToggles({
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
-        className="hud-panel relative ml-auto flex min-h-10 items-center gap-2 rounded-lg px-3 py-2 font-mono text-[11px] uppercase tracking-wide text-ink backdrop-blur hover:border-signal hover:text-signal"
+        className="hud-panel relative ml-auto flex min-h-10 items-center gap-2 rounded-lg px-3 py-2 font-mono text-[12px] uppercase tracking-wide text-ink backdrop-blur hover:border-signal hover:text-signal"
       >
         <span className="grid grid-cols-2 gap-0.5" aria-hidden>
           <span className="h-1.5 w-1.5 rounded-full bg-signal" />
@@ -39,7 +39,7 @@ export default function LayerToggles({
 
       {open && (
         <div className="hud-panel relative mt-2 w-[calc(100vw-2rem)] max-w-64 rounded-xl p-4 backdrop-blur">
-          <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.14em] text-muted">Cross-reference layers</div>
+          <div className="mb-2 font-mono text-[12px] uppercase tracking-[0.14em] text-muted">Cross-reference layers</div>
           <LayerRow
             on={showOsm}
             onToggle={onToggleOsm}
@@ -60,11 +60,11 @@ export default function LayerToggles({
               <span className="h-2.5 w-2.5 rounded-full" style={{ background: THEME.procurement }} />
               Federal procurement
             </div>
-            <p className="mt-1 text-[10px] leading-relaxed text-faint">
+            <p className="mt-1 text-[12px] leading-relaxed text-faint">
               USAspending checks appear inside record profiles. Awards show purchasing evidence, not confirmed deployment.
             </p>
           </div>
-          <p className="mt-3 text-[10px] leading-relaxed text-faint">
+          <p className="mt-3 text-[12px] leading-relaxed text-faint">
             Layers are independent cross-references. Community-mapped locations may be incomplete or outdated.
           </p>
         </div>
@@ -98,7 +98,7 @@ function LayerRow({
           />
           <span className="text-ink">{title}</span>
         </span>
-        <span className="block text-[10px] text-faint">{attribution}</span>
+        <span className="block text-[12px] text-faint">{attribution}</span>
       </span>
     </label>
   );

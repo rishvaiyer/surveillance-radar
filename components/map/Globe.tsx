@@ -448,7 +448,7 @@ export default function Globe({
       <button
         onClick={() => setSpinning((s) => !s)}
         aria-label={spinning ? "Pause globe rotation" : "Resume globe rotation"}
-        className="absolute bottom-20 right-4 z-20 flex items-center gap-1.5 rounded-md border border-edge bg-panel/80 px-3 py-1.5 font-mono text-[11px] uppercase tracking-wide text-ink backdrop-blur transition hover:border-signal hover:text-signal"
+        className="absolute bottom-20 right-4 z-20 flex items-center gap-1.5 rounded-md border border-edge bg-panel/80 px-3 py-1.5 font-mono text-[12px] uppercase tracking-wide text-ink backdrop-blur transition hover:border-signal hover:text-signal"
       >
         {spinning ? (
           <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden>

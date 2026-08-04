@@ -55,7 +55,7 @@ export default function BootOverlay() {
         <div className="mt-4 h-px w-full overflow-hidden bg-edge">
           <span className="block h-full w-1/3 animate-boot-scan bg-signal/70" />
         </div>
-        <div className="mt-3 font-mono text-[10px] uppercase tracking-[0.2em] text-muted">
+        <div className="mt-3 font-mono text-[12px] uppercase tracking-[0.2em] text-muted">
           Acquiring signals…
         </div>
       </div>

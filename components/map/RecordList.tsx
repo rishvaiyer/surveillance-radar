@@ -14,7 +14,7 @@ export default function RecordList({
       aria-label="Filtered surveillance records"
       className="hud-panel absolute inset-x-4 bottom-16 top-32 z-40 w-auto overflow-y-auto rounded-xl p-3 backdrop-blur md:left-4 md:right-auto md:top-96 md:w-80"
     >
-      <h2 className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+      <h2 className="font-mono text-[12px] uppercase tracking-[0.14em] text-muted">
         Showing {Math.min(records.length, 250).toLocaleString()} of {records.length.toLocaleString()}
       </h2>
       <ul className="mt-2 space-y-2">

@@ -34,11 +34,11 @@ function ProcurementCheck({ r }: { r: MapRecord }) {
 
   return (
     <section className="mt-4 rounded-lg border border-emerald-300/30 bg-emerald-300/5 p-3">
-      <h4 className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-emerald-300">
+      <h4 className="flex items-center gap-2 font-mono text-[12px] uppercase tracking-[0.14em] text-emerald-300">
         <span className="h-2 w-2 rounded-full" style={{ background: THEME.procurement }} />
         Federal procurement check
       </h4>
-      <p className="mt-1 text-[11px] leading-relaxed text-muted">
+      <p className="mt-1 text-[12px] leading-relaxed text-muted">
         Search USAspending for “{searchTerm}”. An award can document a purchase or funding relationship, but does not prove where or whether equipment is currently deployed.
       </p>
       <a
@@ -104,7 +104,7 @@ function RecordBody({ r }: { r: MapRecord }) {
 
       {r.sourceUrls.length > 0 && (
         <div className="mt-3">
-          <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">Evidence links</div>
+          <div className="font-mono text-[12px] uppercase tracking-[0.14em] text-muted">Evidence links</div>
           <ul className="mt-1 space-y-1">
             {r.sourceUrls.map((u, i) => (
               <li key={u}>
@@ -128,10 +128,10 @@ function RecordBody({ r }: { r: MapRecord }) {
 
       {r.alprEvidence && (
         <section className="mt-4 rounded-lg border border-amber-400/30 bg-amber-400/5 p-3">
-          <h4 className="font-mono text-[10px] uppercase tracking-[0.14em] text-amber-300">
+          <h4 className="font-mono text-[12px] uppercase tracking-[0.14em] text-amber-300">
             EFF Data Driven · historical ALPR report
           </h4>
-          <p className="mt-1 text-[11px] leading-relaxed text-muted">
+          <p className="mt-1 text-[12px] leading-relaxed text-muted">
             Agency-reported Vigilant Solutions activity from 2016–2017. Historical evidence, not a claim of current use.
           </p>
           <dl className="mt-2 space-y-1 text-xs">
@@ -168,7 +168,7 @@ function RecordBody({ r }: { r: MapRecord }) {
       <ProcurementCheck r={r} />
 
       {r.geocodeSource && r.geocodeSource !== "csv" && (
-        <p className="mt-3 text-[11px] text-faint">
+        <p className="mt-3 text-[12px] text-faint">
           Plotted at the U.S. Census {r.geocodeSource} representative point. This is not a precise deployment site.
         </p>
       )}
@@ -193,7 +193,7 @@ export default function RecordDrawer({
   return (
     <aside className="absolute right-0 top-0 z-30 flex h-full w-full max-w-sm flex-col border-l border-edge bg-panel/95 backdrop-blur">
       <div className="flex items-center justify-between p-4">
-        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+        <span className="font-mono text-[12px] uppercase tracking-[0.14em] text-muted">
           {records.length > 1 ? `${records.length} records here` : "Surveillance record"}
         </span>
         <button
@@ -209,10 +209,10 @@ export default function RecordDrawer({
 
       <div className="scrollbar-thin flex-1 space-y-4 overflow-y-auto px-4 pb-4">
         <section className="rounded-xl border border-edge bg-space/40 p-3">
-          <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-signal">
+          <div className="font-mono text-[12px] uppercase tracking-[0.14em] text-signal">
             Area Documentation Profile
           </div>
-          <p className="mt-1 text-[11px] leading-relaxed text-muted">
+          <p className="mt-1 text-[12px] leading-relaxed text-muted">
             A summary of published documentation at this mapped area. It is not a safety or surveillance score.
           </p>
           <dl className="mt-3 grid grid-cols-2 gap-2 text-xs">
@@ -221,7 +221,7 @@ export default function RecordDrawer({
             <div className="rounded-lg border border-edge p-2"><dt className="text-faint">Named vendors</dt><dd className="mt-0.5 text-lg text-ink">{vendors.size}</dd></div>
             <div className="rounded-lg border border-edge p-2"><dt className="text-faint">Evidence links</dt><dd className="mt-0.5 text-lg text-ink">{evidenceLinks.size}</dd></div>
           </dl>
-          <div className="mt-2 flex items-center justify-between text-[10px] text-faint">
+          <div className="mt-2 flex items-center justify-between text-[12px] text-faint">
             <span>{sourceTypes} integrated source {sourceTypes === 1 ? "type" : "types"}</span>
             <span>Coverage may be incomplete</span>
           </div>
@@ -231,7 +231,7 @@ export default function RecordDrawer({
         ))}
       </div>
 
-      <div className="border-t border-edge p-4 text-[11px] text-muted">
+      <div className="border-t border-edge p-4 text-[12px] text-muted">
         Data from EFF Atlas of Surveillance. Independent visualization; not affiliated with or
         endorsed by EFF.
       </div>

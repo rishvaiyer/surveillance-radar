@@ -82,7 +82,7 @@ export default function CountryPanel({
   return (
     <aside className="absolute right-0 top-0 z-30 flex h-full w-full max-w-sm flex-col border-l border-edge bg-panel/95 backdrop-blur">
       <div className="flex items-center justify-between p-4">
-        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">Country profile</span>
+        <span className="font-mono text-[12px] uppercase tracking-[0.14em] text-muted">Country profile</span>
         <button onClick={onClose} aria-label="Close" className="rounded p-1 text-muted transition hover:text-signal">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
             <path d="M6 6l12 12M18 6L6 18" />
@@ -93,7 +93,7 @@ export default function CountryPanel({
       <div className="scrollbar-thin flex-1 space-y-4 overflow-y-auto px-4 pb-4">
         <section className="rounded-xl border border-edge bg-space/40 p-3">
           <h2 className="font-display text-lg text-ink">{country.name}</h2>
-          <p className="mt-1 text-[11px] leading-relaxed text-muted">
+          <p className="mt-1 text-[12px] leading-relaxed text-muted">
             {isUS
               ? "EFF Atlas of Surveillance is documented at the state level for the United States."
               : "EFF Atlas of Surveillance documents only the United States; totals below cover the cross-reference layers."}
@@ -116,7 +116,7 @@ export default function CountryPanel({
 
         {isUS && stats.topStates.length > 0 && (
           <section>
-            <h3 className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+            <h3 className="font-mono text-[12px] uppercase tracking-[0.14em] text-muted">
               Top states ({stats.totalStates} documented)
             </h3>
             <div className="mt-2 space-y-1.5">
@@ -128,14 +128,14 @@ export default function CountryPanel({
                   className="flex w-full items-center gap-2 rounded px-1 py-0.5 text-left hover:bg-white/5"
                   aria-label={`Filter the map to ${state}`}
                 >
-                  <span className="w-8 flex-none font-mono text-[10px] text-ink-2">{state}</span>
+                  <span className="w-8 flex-none font-mono text-[12px] text-ink-2">{state}</span>
                   <span className="relative h-2 flex-1 overflow-hidden rounded-sm bg-white/5">
                     <span
                       className="absolute inset-y-0 left-0 rounded-sm bg-signal"
                       style={{ width: `${(count / maxState) * 100}%`, boxShadow: "0 0 8px #38e1ff" }}
                     />
                   </span>
-                  <span className="w-10 flex-none text-right font-mono text-[10px] tabular-nums text-muted">{count}</span>
+                  <span className="w-10 flex-none text-right font-mono text-[12px] tabular-nums text-muted">{count}</span>
                 </button>
               ))}
             </div>
@@ -144,13 +144,13 @@ export default function CountryPanel({
 
         {isUS && stats.topTechnologies.length > 0 && (
           <section>
-            <h3 className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">Technology breakdown</h3>
+            <h3 className="font-mono text-[12px] uppercase tracking-[0.14em] text-muted">Technology breakdown</h3>
             <div className="mt-2 space-y-1.5">
               {stats.topTechnologies.map(([tech, count]) => {
                 const color = TECH_COLORS[tech] || TECH_FALLBACK;
                 return (
                   <div key={tech} className="flex items-center gap-2">
-                    <span className="w-32 truncate text-right font-mono text-[10px] text-ink-2" title={tech}>
+                    <span className="w-32 truncate text-right font-mono text-[12px] text-ink-2" title={tech}>
                       {tech}
                     </span>
                     <span className="relative h-2 flex-1 overflow-hidden rounded-sm bg-white/5">
@@ -159,7 +159,7 @@ export default function CountryPanel({
                         style={{ width: `${(count / maxTech) * 100}%`, backgroundColor: color, boxShadow: `0 0 8px ${color}` }}
                       />
                     </span>
-                    <span className="w-10 flex-none text-right font-mono text-[10px] tabular-nums text-muted">{count}</span>
+                    <span className="w-10 flex-none text-right font-mono text-[12px] tabular-nums text-muted">{count}</span>
                   </div>
                 );
               })}
@@ -169,14 +169,14 @@ export default function CountryPanel({
 
         {stats.topAgencies.length > 0 && (
           <section>
-            <h3 className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+            <h3 className="font-mono text-[12px] uppercase tracking-[0.14em] text-muted">
               {isUS ? "Top agencies (by documented technologies)" : "Agencies referenced (Wikidata)"}
             </h3>
             <ul className="mt-2 space-y-1 text-xs text-ink-2">
               {stats.topAgencies.map(([name, count]) => (
                 <li key={name} className="flex items-center justify-between gap-2">
                   <span className="truncate">{name}</span>
-                  {isUS && <span className="flex-none font-mono text-[10px] text-muted">{count}</span>}
+                  {isUS && <span className="flex-none font-mono text-[12px] text-muted">{count}</span>}
                 </li>
               ))}
             </ul>
@@ -184,13 +184,13 @@ export default function CountryPanel({
         )}
 
         {!isUS && stats.wikidataTotal === 0 && stats.osmTotal === 0 && (
-          <p className="text-[11px] leading-relaxed text-faint">
+          <p className="text-[12px] leading-relaxed text-faint">
             No documented records found for {country.name} in any connected layer. Absence here reflects data coverage,
             not absence of surveillance.
           </p>
         )}
 
-        <section className="rounded-lg border border-edge bg-space/30 p-3 text-[10px] leading-relaxed text-faint">
+        <section className="rounded-lg border border-edge bg-space/30 p-3 text-[12px] leading-relaxed text-faint">
           <div className="mb-1 font-mono uppercase tracking-[0.14em] text-muted">Sources &amp; licenses</div>
           {isUS && <p>EFF Atlas of Surveillance: CC BY 4.0.</p>}
           <p>OpenStreetMap contributors: ODbL 1.0. © OpenStreetMap contributors.</p>

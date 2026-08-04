@@ -85,7 +85,7 @@ export default function StatHud({
           <button
             onClick={() => setOpen((o) => !o)}
             aria-label="Toggle technology breakdown"
-            className="ml-1 self-center rounded border border-edge px-1.5 py-1 font-mono text-[10px] text-muted hover:border-signal hover:text-signal"
+            className="ml-1 self-center rounded border border-edge px-1.5 py-1 font-mono text-[12px] text-muted hover:border-signal hover:text-signal"
           >
             {open ? "–" : "▤"}
           </button>
@@ -98,7 +98,7 @@ export default function StatHud({
             const color = TECH_COLORS[t.label] || TECH_FALLBACK;
             return (
               <div key={t.label} className="flex items-center gap-2">
-                <span className="w-28 truncate text-right font-mono text-[10px] text-ink-2" title={t.label}>
+                <span className="w-28 truncate text-right font-mono text-[12px] text-ink-2" title={t.label}>
                   {t.label}
                 </span>
                 <span className="relative h-2 flex-1 overflow-hidden rounded-sm bg-white/5">
@@ -111,7 +111,7 @@ export default function StatHud({
                     }}
                   />
                 </span>
-                <span className="w-5 text-right font-mono text-[10px] tabular-nums text-muted">{t.count}</span>
+                <span className="w-5 text-right font-mono text-[12px] tabular-nums text-muted">{t.count}</span>
               </div>
             );
           })}

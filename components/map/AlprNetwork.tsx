@@ -58,14 +58,14 @@ export default function AlprNetwork({
       <div className="absolute left-4 right-4 top-20 z-10 rounded-xl border border-edge bg-panel/90 p-3 backdrop-blur md:left-[19rem] md:p-4">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-amber-300">EFF Data Driven · 2016–2017</p>
+            <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-amber-300">EFF Data Driven · 2016–2017</p>
             <h2 className="mt-1 font-display text-lg text-ink md:text-xl">ALPR sharing landscape</h2>
             <p className="mt-1 hidden max-w-2xl text-xs text-muted sm:block">
               Each node is an agency with a primary EFF report. Node size reflects reported direct-sharing partners.
               Lines show verified participation in the shared NVLS pool, not direct agency-to-agency relationships.
             </p>
-            <a href="/" className="mt-2 inline-block font-mono text-[10px] text-signal hover:underline">
-              Built by unevil-warden · Rishva Iyer · View portfolio
+            <a href="/" className="mt-2 inline-block font-mono text-[12px] text-signal hover:underline">
+              Built by Rish Iyer · View portfolio
             </a>
           </div>
           <div className="hidden text-right font-mono text-xs text-ink-2 sm:block">
@@ -159,7 +159,7 @@ export default function AlprNetwork({
                 <div className="mt-2 font-mono text-xs text-amber-300">
                   {node.sharing ? `${node.sharing.toLocaleString()} sharing partners` : "Sharing count unavailable"}
                 </div>
-                <div className="mt-1 text-[11px] text-muted">
+                <div className="mt-1 text-[12px] text-muted">
                   {node.nvls ? "Reported NVLS participant" : "No NVLS participation reported"}
                 </div>
               </button>
@@ -185,7 +185,7 @@ export default function AlprNetwork({
         </div>
       )}
 
-      <div className="absolute bottom-16 right-5 hidden rounded-lg border border-edge bg-panel/90 p-3 text-[11px] text-muted md:block">
+      <div className="absolute bottom-16 right-5 hidden rounded-lg border border-edge bg-panel/90 p-3 text-[12px] text-muted md:block">
         <div><span className="mr-2 inline-block h-2 w-2 rounded-full bg-amber-300" />Reported NVLS participant</div>
         <div className="mt-1"><span className="mr-2 inline-block h-2 w-2 rounded-full bg-signal" />No NVLS participation reported</div>
       </div>

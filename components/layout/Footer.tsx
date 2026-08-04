@@ -15,7 +15,7 @@ export default function Footer({ summary }: { summary: SourceSummary }) {
 
   return (
     <footer className="pointer-events-none absolute bottom-2 left-2 z-20 md:bottom-4 md:left-1/2 md:-translate-x-1/2">
-      <div className="hud-panel relative pointer-events-auto rounded-lg px-3 py-2 text-[10px] text-muted backdrop-blur">
+      <div className="hud-panel relative pointer-events-auto rounded-lg px-3 py-2 text-[12px] text-muted backdrop-blur">
         <button onClick={() => setOpen((value) => !value)} className="font-mono text-signal hover:underline">
           {open ? "Close sources" : "Sources & methodology"}
         </button>
