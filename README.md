@@ -36,6 +36,8 @@ been researched yet or the data has not been updated.
 | [EFF Atlas of Surveillance](https://www.atlasofsurveillance.org/data-library) | CC BY 4.0 | ~15k U.S. law-enforcement surveillance deployments | `pnpm ingest:atlas` | Live download every run (falls back to committed CSV, then bundled demo CSV) |
 | [EFF "Data Driven" ALPR report](https://www.eff.org/pages/download-alpr-dataset) (2016-2017) | CC BY | ~200 agencies' automated license-plate-reader data-sharing stats | `pnpm ingest:alpr` | Historical, fixed-year dataset — no live endpoint; regenerated from the committed CSV |
 | [OpenStreetMap](https://www.openstreetmap.org/copyright) (Overpass API) | ODbL 1.0 | `man_made=surveillance` nodes across 24 curated world cities/regions | `pnpm ingest:osm` | Live Overpass query every run (falls back to committed sample) |
+| [OpenStreetMap](https://www.openstreetmap.org/copyright) — ALPR sweep (incl. [DeFlock](https://deflock.me/) mapping) | ODbL 1.0 | `surveillance:type=ALPR` license-plate readers, worldwide, tiled and downsampled | `pnpm ingest:osm` | Live Overpass query every run (falls back to committed sample) |
+| [USAspending.gov](https://api.usaspending.gov/) | Public domain (U.S. government work) | DHS + DOJ prime contract awards to surveillance-technology vendors, by state | `pnpm ingest:usaspending` | Live API query every run (falls back to committed snapshot) |
 | [Wikidata](https://www.wikidata.org/wiki/Wikidata:Licensing) (SPARQL / WDQS) | CC0 1.0 | Intelligence agencies (`wd:Q47913`) + law-enforcement agencies (`wd:Q732717`), worldwide, with coordinates | `pnpm ingest:wikidata` | Live SPARQL query every run (falls back to committed sample) |
 | [U.S. Census Gazetteer](https://www.census.gov/geographies/reference-files/time-series/geo/gazetteer-files.2025.html) (2025) | Public domain (U.S. government work) | City/county centroids used for offline Atlas geocoding | `pnpm ingest:centroids` | Regenerated from committed Census files (no live endpoint; annual Census release) |
 
@@ -51,6 +53,50 @@ memory first and only overwrites the committed file on success. A source that's 
 limited, or exceeds its time budget simply keeps the file already on disk — a failed or partial CI
 run never leaves a half-written or empty dataset. Each script uses a per-request timeout, retries
 once before giving up, and enforces a total wall-clock budget for the whole source.
+
+### License plate readers (OSM / DeFlock)
+
+The OSM sweep runs twice: once for general `man_made=surveillance` nodes across the curated
+regions, and once worldwide for `surveillance:type=ALPR` — the tagging used by the
+[DeFlock](https://deflock.me/) license-plate-reader mapping project, whose data lives in OSM
+itself. Verified 2026-08-04 with Overpass `out count`: **135,358 ALPR nodes worldwide, 125,485 of
+them in the continental U.S.** (93%).
+
+Baking 135k points into a committed file would add ~15MB of churn to the repo every weekly CI run
+and would render as an illegible blob at globe zoom, so the ALPR sweep is **tiled** (a 4x6 grid
+over the continental U.S. plus 10 coarse world tiles) and then **spatially downsampled** to 12,000
+features. Tiling is what makes the sample spatially even — a single capped worldwide query returns
+Overpass's own internal ordering, which clusters. The committed file records both the sampled
+count and the observed worldwide total, so the sampling is visible rather than implied.
+
+ALPR points render in gold, matching "Automated License Plate Readers" in the technology legend:
+colour tracks technology across every layer, and the hover popup names the source.
+
+### Federal procurement (USAspending)
+
+`pnpm ingest:usaspending` pulls DHS and DOJ prime contract awards to documented
+surveillance-technology vendors (Axon, Palantir, Cellebrite, Clearview AI, SoundThinking, Magnet
+Forensics, Grayshift, Babel Street, Motorola Solutions and others) and aggregates them to the
+state of each award's place of performance. As of 2026-08-04 that is **1,695 awards across 41
+states, $2.44B obligated**.
+
+Three deliberate choices, all of which trade reach for honesty:
+
+- **State-level, not precise.** Awards do carry a Zip5, so finer geocoding is available. It is not
+  used. Place of performance on a federal contract is frequently a vendor facility or contracting
+  office, not a surveillance site; plotting a precise dot would assert something the data does not
+  support. The layer draws sized rings over states, not glowing points.
+- **DHS and DOJ only.** An unscoped run returns $7.87B, of which Palantir and Motorola Solutions
+  are 91% and the single largest line is an Army software task order. Filtering by awarding agency
+  (rather than dropping those vendors) keeps their genuinely law-enforcement contracts — Palantir
+  with ICE and the FBI, for instance — and removes defense IT that would inflate and misdescribe
+  the totals.
+- **Matched by vendor, not by product.** Motorola Solutions sells far more two-way radio than
+  surveillance, so its DHS/DOJ total ($1.31B, the largest of any vendor) is not all surveillance
+  spending. The per-state popup breaks totals down by vendor so this is visible rather than buried.
+
+An award documents a **purchase, not a deployment**, and totals are a floor: at most 500 awards per
+vendor are read, highest amount first.
 
 The OSM and Wikidata layers are optional, **toggleable** (off by default), and let you
 cross-reference EFF deployments against other public datasets. Each is baked to a static file in
@@ -136,6 +182,10 @@ CSV out of source control.
 - Coverage reflects what the EFF Atlas has documented; it is not a complete record of all
   surveillance technology in use.
 - Points geocoded to a city/county/state centroid are approximate locations, not precise sites.
+- The ALPR layer is a 12,000-feature sample of ~135,000 mapped nodes, and OSM tagging is
+  community-contributed, so it is neither complete nor uniformly maintained.
+- Procurement totals are a floor (500 awards per vendor, DHS and DOJ only) and count a vendor's
+  whole business with those agencies, not only its surveillance products.
 - The bundled demo data uses real public agency/technology/vendor categories but **placeholder
   source URLs** (`example.org/...`). Replace it with the real Atlas CSV for genuine evidence links.
 
@@ -161,8 +211,9 @@ surveillance-radar/
   lib/atlas/               # schema (Zod), normalize, geocode, search, filters, theme
   scripts/ingest-atlas.ts       # EFF CSV (live download w/ fallback) -> normalized, geocoded, validated JSON
   scripts/ingest-eff-alpr.ts    # EFF "Data Driven" ALPR CSV -> data/processed + public/eff-data-driven-alpr.json
-  scripts/ingest-osm.ts         # Overpass (24 curated world regions) -> public/osm-surveillance.geojson
+  scripts/ingest-osm.ts         # Overpass: 24 curated regions + worldwide ALPR tiles -> public/osm-surveillance.geojson
   scripts/ingest-wikidata.ts    # SPARQL (intelligence + law-enforcement agencies) -> public/wikidata-agencies.geojson
+  scripts/ingest-usaspending.ts # USAspending DHS/DOJ awards -> public/procurement-awards.geojson
   scripts/ingest-census-centroids.ts  # Census Gazetteer -> data/centroids/us-places.json
   .github/workflows/refresh-data.yml  # weekly + on-demand `pnpm run ingest:all`, commits changed data
   data/
@@ -172,8 +223,9 @@ surveillance-radar/
   public/world.geojson              # bundled land outlines (no tile server needed)
   public/atlas-records.json         # EFF Atlas records the app fetches (CC BY)
   public/eff-data-driven-alpr.json  # EFF ALPR data-sharing records (CC BY)
-  public/osm-surveillance.geojson   # OSM surveillance nodes (sample committed; ODbL)
+  public/osm-surveillance.geojson   # OSM surveillance + ALPR nodes (sample committed; ODbL)
   public/wikidata-agencies.geojson  # Wikidata agencies (sample committed; CC0)
+  public/procurement-awards.geojson # USAspending awards by state (public domain)
 ```
 
 ## Extracting into its own repository

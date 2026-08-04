@@ -14,9 +14,16 @@ export const THEME = {
   // from the cyan EFF points.
   osm: "#b07cff", // violet — community-mapped surveillance equipment (ODbL)
   osmBright: "#dcc6ff",
+  // ALPR nodes within the OSM layer are colored by TECHNOLOGY rather than by
+  // source: gold matches "Automated License Plate Readers" in TECH_COLORS, so
+  // one reading of the legend holds across every layer. The hover popup still
+  // names OpenStreetMap as the source, so layer identity isn't lost.
+  osmAlpr: "#ffcf5c",
+  osmAlprBright: "#ffe9ad",
   wikidata: "#5aa0ff", // blue — Wikidata agency reference points (CC0)
   wikidataBright: "#b5d1ff",
   procurement: "#57f2a3", // mint — federal procurement research via USAspending
+  procurementBright: "#b6ffdb",
   uiText: "#dbe6f2",
   uiMuted: "#7d8ba0",
 } as const;

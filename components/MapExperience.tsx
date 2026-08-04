@@ -58,6 +58,7 @@ export default function MapExperience({
   const [networkView, setNetworkView] = useState(false);
   const [showOsm, setShowOsm] = useState(false);
   const [showWikidata, setShowWikidata] = useState(false);
+  const [showProcurement, setShowProcurement] = useState(false);
   // Country/region breakdown panel (opened by clicking a country on the globe).
   const [selectedCountry, setSelectedCountry] = useState<ClickedCountry | null>(null);
   const [osmFeatures, setOsmFeatures] = useState<PointFeature[]>([]);
@@ -166,6 +167,7 @@ export default function MapExperience({
         onSelect={selectRecords}
         showOsm={showOsm}
         showWikidata={showWikidata}
+        showProcurement={showProcurement}
         onCountryClick={handleCountryClick}
       />
 
@@ -238,8 +240,10 @@ export default function MapExperience({
       <LayerToggles
         showOsm={showOsm}
         showWikidata={showWikidata}
+        showProcurement={showProcurement}
         onToggleOsm={() => setShowOsm((value) => !value)}
         onToggleWikidata={() => setShowWikidata((value) => !value)}
+        onToggleProcurement={() => setShowProcurement((value) => !value)}
       />
 
       {listView && <RecordList records={filtered} onSelect={(record) => selectRecords([record])} />}

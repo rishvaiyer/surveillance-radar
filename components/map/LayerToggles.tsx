@@ -9,16 +9,20 @@ import { THEME } from "../../lib/atlas/theme";
 export default function LayerToggles({
   showOsm,
   showWikidata,
+  showProcurement,
   onToggleOsm,
   onToggleWikidata,
+  onToggleProcurement,
 }: {
   showOsm: boolean;
   showWikidata: boolean;
+  showProcurement: boolean;
   onToggleOsm: () => void;
   onToggleWikidata: () => void;
+  onToggleProcurement: () => void;
 }) {
   const [open, setOpen] = useState(false);
-  const activeCount = Number(showOsm) + Number(showWikidata);
+  const activeCount = Number(showOsm) + Number(showWikidata) + Number(showProcurement);
 
   return (
     <div className="absolute right-4 top-20 z-20 sm:top-24">
@@ -44,8 +48,10 @@ export default function LayerToggles({
             on={showOsm}
             onToggle={onToggleOsm}
             color={THEME.osm}
+            secondColor={THEME.osmAlpr}
             title="Mapped equipment"
             attribution="OpenStreetMap contributors · ODbL"
+            note="Includes worldwide license-plate readers (gold), sampled from OSM."
           />
           <LayerRow
             on={showWikidata}
@@ -54,17 +60,16 @@ export default function LayerToggles({
             title="Agency reference"
             attribution="Wikidata · CC0"
           />
+          <LayerRow
+            on={showProcurement}
+            onToggle={onToggleProcurement}
+            color={THEME.procurement}
+            title="Federal procurement"
+            attribution="USAspending.gov · public domain"
+            note="Award dollars by state. Purchasing evidence, not confirmed deployment."
+          />
 
-          <div className="mt-3 border-t border-edge pt-3">
-            <div className="flex items-center gap-2 text-xs text-ink">
-              <span className="h-2.5 w-2.5 rounded-full" style={{ background: THEME.procurement }} />
-              Federal procurement
-            </div>
-            <p className="mt-1 text-[12px] leading-relaxed text-faint">
-              USAspending checks appear inside record profiles. Awards show purchasing evidence, not confirmed deployment.
-            </p>
-          </div>
-          <p className="mt-3 text-[12px] leading-relaxed text-faint">
+          <p className="mt-3 border-t border-edge pt-3 text-[12px] leading-relaxed text-faint">
             Layers are independent cross-references. Community-mapped locations may be incomplete or outdated.
           </p>
         </div>
@@ -77,14 +82,20 @@ function LayerRow({
   on,
   onToggle,
   color,
+  secondColor,
   title,
   attribution,
+  note,
 }: {
   on: boolean;
   onToggle: () => void;
   color: string;
+  // Optional second swatch, for a layer that renders in two colors (the OSM
+  // layer splits camera violet from ALPR gold).
+  secondColor?: string;
   title: string;
   attribution: string;
+  note?: string;
 }) {
   return (
     <label className="mt-1 flex cursor-pointer items-start gap-2 py-1 text-xs text-ink-2">
@@ -96,9 +107,17 @@ function LayerRow({
             className="inline-block h-2.5 w-2.5 rounded-full"
             style={{ backgroundColor: color, boxShadow: `0 0 7px ${color}` }}
           />
+          {secondColor && (
+            <span
+              aria-hidden
+              className="-ml-1 inline-block h-2.5 w-2.5 rounded-full"
+              style={{ backgroundColor: secondColor, boxShadow: `0 0 7px ${secondColor}` }}
+            />
+          )}
           <span className="text-ink">{title}</span>
         </span>
         <span className="block text-[12px] text-faint">{attribution}</span>
+        {note && <span className="mt-0.5 block text-[12px] leading-relaxed text-faint">{note}</span>}
       </span>
     </label>
   );

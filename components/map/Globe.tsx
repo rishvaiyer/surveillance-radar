@@ -53,17 +53,42 @@ const REDUCED_MOTION =
   window.matchMedia &&
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+// OSM features carry a `category` of "alpr" or "camera" (files written before
+// the ALPR sweep existed have no category at all, hence the fallback). ALPR
+// nodes take the gold technology color; everything else stays layer violet.
+const OSM_COLOR = ["case", ["==", ["get", "category"], "alpr"], THEME.osmAlpr, THEME.osm] as any;
+const OSM_COLOR_BRIGHT = [
+  "case",
+  ["==", ["get", "category"], "alpr"],
+  THEME.osmAlprBright,
+  THEME.osmBright,
+] as any;
+
+// Procurement bubbles are sized by total obligated dollars. sqrt keeps a $400M
+// state from dwarfing a $2M one into invisibility while still ranking them.
+const PROCUREMENT_RADIUS = [
+  "interpolate",
+  ["linear"],
+  ["sqrt", ["max", ["get", "totalAmount"], 1]],
+  1_000, // $1M
+  7,
+  25_000, // $625M
+  34,
+] as any;
+
 export default function Globe({
   records,
   onSelect,
   showOsm,
   showWikidata,
+  showProcurement,
   onCountryClick,
 }: {
   records: MapRecord[];
   onSelect: (records: MapRecord[]) => void;
   showOsm: boolean;
   showWikidata: boolean;
+  showProcurement: boolean;
   onCountryClick: (country: ClickedCountry) => void;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -193,10 +218,12 @@ export default function Globe({
         source: "osm",
         layout: { visibility: "none" },
         paint: {
-          "circle-color": THEME.osm,
+          "circle-color": OSM_COLOR,
           "circle-blur": 1,
           "circle-opacity": 0.5,
-          "circle-radius": 9,
+          // ALPR points are ~12k strong and dense along road networks; a
+          // smaller glow keeps a metro from turning into one solid blob.
+          "circle-radius": ["case", ["==", ["get", "category"], "alpr"], 6, 9] as any,
         },
       });
       map.addLayer({
@@ -205,9 +232,9 @@ export default function Globe({
         source: "osm",
         layout: { visibility: "none" },
         paint: {
-          "circle-color": THEME.osmBright,
-          "circle-radius": 3.5,
-          "circle-stroke-color": THEME.osm,
+          "circle-color": OSM_COLOR_BRIGHT,
+          "circle-radius": ["case", ["==", ["get", "category"], "alpr"], 2.5, 3.5] as any,
+          "circle-stroke-color": OSM_COLOR,
           "circle-stroke-width": 1.5,
         },
       });
@@ -236,6 +263,38 @@ export default function Globe({
           "circle-radius": 4.5,
           "circle-stroke-color": THEME.wikidata,
           "circle-stroke-width": 2,
+        },
+      });
+
+      // Federal procurement awards (USAspending.gov, public domain), aggregated
+      // to the state of each award's place of performance. Rendered as hollow
+      // sized rings rather than points on purpose: this layer describes
+      // PURCHASING across a whole state, not a located deployment, and a ring
+      // over a state reads that way where a glowing dot would not.
+      map.addSource("procurement", { type: "geojson", data: `${BASE}/procurement-awards.geojson` });
+      map.addLayer({
+        id: "procurement-fill",
+        type: "circle",
+        source: "procurement",
+        layout: { visibility: "none" },
+        paint: {
+          "circle-color": THEME.procurement,
+          "circle-blur": 1,
+          "circle-opacity": 0.18,
+          "circle-radius": PROCUREMENT_RADIUS,
+        },
+      });
+      map.addLayer({
+        id: "procurement-ring",
+        type: "circle",
+        source: "procurement",
+        layout: { visibility: "none" },
+        paint: {
+          "circle-color": "rgba(0,0,0,0)",
+          "circle-radius": PROCUREMENT_RADIUS,
+          "circle-stroke-color": THEME.procurement,
+          "circle-stroke-width": 1.5,
+          "circle-stroke-opacity": 0.9,
         },
       });
 
@@ -330,12 +389,19 @@ export default function Globe({
     };
 
     map.on("mousemove", "osm-core", (e) => {
-      const p = e.features?.[0]?.properties as { surveillanceType?: string; operator?: string; description?: string };
+      const p = e.features?.[0]?.properties as {
+        surveillanceType?: string;
+        operator?: string;
+        description?: string;
+        category?: string;
+      };
+      const isAlpr = p.category === "alpr";
+      const color = isAlpr ? THEME.osmAlpr : THEME.osm;
       showPopup(
         e,
         `<div class="sr-popup">
-           <div class="sr-popup-title"><span class="sr-chip" style="background:${THEME.osm};color:${THEME.osm}"></span>OSM · ${escapeHtml(
-             p.surveillanceType || "surveillance"
+           <div class="sr-popup-title"><span class="sr-chip" style="background:${color};color:${color}"></span>OSM · ${escapeHtml(
+             isAlpr ? "License plate reader" : p.surveillanceType || "surveillance"
            )}</div>
            <div class="sr-sub">${escapeHtml(p.operator || p.description || "OpenStreetMap node")}</div>
            <div class="sr-attr">© OpenStreetMap contributors (ODbL)</div>
@@ -343,6 +409,39 @@ export default function Globe({
       );
     });
     map.on("mouseleave", "osm-core", hide);
+
+    map.on("mousemove", "procurement-ring", (e) => {
+      const p = e.features?.[0]?.properties as {
+        state?: string;
+        totalAmount?: number;
+        awardCount?: number;
+        vendors?: string;
+      };
+      // MapLibre serializes non-primitive feature properties to JSON strings.
+      let vendors: { name: string; amount: number }[] = [];
+      try {
+        vendors = typeof p.vendors === "string" ? JSON.parse(p.vendors) : [];
+      } catch {
+        vendors = [];
+      }
+      const top = vendors
+        .slice(0, 3)
+        .map((v) => `${escapeHtml(v.name)} ${usd(v.amount)}`)
+        .join(" · ");
+      showPopup(
+        e,
+        `<div class="sr-popup">
+           <div class="sr-popup-title"><span class="sr-chip" style="background:${THEME.procurement};color:${
+             THEME.procurement
+           }"></span>${escapeHtml(p.state || "")} · ${usd(Number(p.totalAmount ?? 0))}</div>
+           <div class="sr-sub">${Number(p.awardCount ?? 0)} federal award${
+             Number(p.awardCount ?? 0) === 1 ? "" : "s"
+           }${top ? ` — ${top}` : ""}</div>
+           <div class="sr-attr">USAspending.gov · purchases, not deployments</div>
+         </div>`
+      );
+    });
+    map.on("mouseleave", "procurement-ring", hide);
 
     map.on("mousemove", "wikidata-core", (e) => {
       const p = e.features?.[0]?.properties as { name?: string; country?: string };
@@ -395,7 +494,9 @@ export default function Globe({
     set("osm-core", showOsm);
     set("wikidata-glow", showWikidata);
     set("wikidata-core", showWikidata);
-  }, [showOsm, showWikidata, ready]);
+    set("procurement-fill", showProcurement);
+    set("procurement-ring", showProcurement);
+  }, [showOsm, showWikidata, showProcurement, ready]);
 
   // Keep the GeoJSON source in sync with filtered records.
   useEffect(() => {
@@ -464,6 +565,15 @@ export default function Globe({
       </button>
     </div>
   );
+}
+
+// Compact dollar formatting for popups: $1.4B / $22.6M / $840K.
+function usd(amount: number): string {
+  if (!Number.isFinite(amount) || amount <= 0) return "$0";
+  if (amount >= 1e9) return `$${(amount / 1e9).toFixed(1)}B`;
+  if (amount >= 1e6) return `$${(amount / 1e6).toFixed(1)}M`;
+  if (amount >= 1e3) return `$${Math.round(amount / 1e3)}K`;
+  return `$${Math.round(amount)}`;
 }
 
 function escapeHtml(s: string): string {
