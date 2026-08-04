@@ -6,6 +6,9 @@ import Papa from "papaparse";
 const ROOT = path.resolve(__dirname, "..");
 const INPUT = path.join(ROOT, "data/raw/eff-data-driven-alpr-2016-2017.csv");
 const OUTPUT = path.join(ROOT, "data/processed/eff-data-driven-alpr.json");
+// The app fetches this at runtime from public/ (see components/MapExperience.tsx),
+// so both copies must be written together.
+const PUBLIC_OUTPUT = path.join(ROOT, "public/eff-data-driven-alpr.json");
 
 function value(row: Record<string, string>, prefix: string): string | null {
   const key = Object.keys(row).find((header) => header.startsWith(prefix));
@@ -47,5 +50,11 @@ const records = parsed.data
   }))
   .filter((record) => record.agencyName && record.state && record.sourceUrls.length > 0);
 
-fs.writeFileSync(OUTPUT, JSON.stringify(records));
-console.log(`Wrote ${records.length} sourced EFF Data Driven records to ${path.relative(ROOT, OUTPUT)}`);
+const json = JSON.stringify(records);
+fs.mkdirSync(path.dirname(OUTPUT), { recursive: true });
+fs.mkdirSync(path.dirname(PUBLIC_OUTPUT), { recursive: true });
+fs.writeFileSync(OUTPUT, json);
+fs.writeFileSync(PUBLIC_OUTPUT, json);
+console.log(
+  `Wrote ${records.length} sourced EFF Data Driven records to ${path.relative(ROOT, OUTPUT)} and ${path.relative(ROOT, PUBLIC_OUTPUT)}`
+);

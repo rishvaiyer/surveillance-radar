@@ -11,13 +11,27 @@ const RAW_CSV = path.join(ROOT, "data/raw/atlas-of-surveillance.csv");
 const SAMPLE_CSV = path.join(ROOT, "data/raw/sample-atlas.csv");
 const OUT_RECORDS = path.join(ROOT, "data/processed/atlas-records.json");
 const OUT_SUMMARY = path.join(ROOT, "data/processed/atlas-summary.json");
+// The app fetches records at runtime from public/ (see components/MapExperience.tsx),
+// while atlas-summary.json is statically imported from data/processed/ at build
+// time (see app/page.tsx) and does not need a public/ copy. Both files must be
+// written together so a live refresh doesn't silently go stale in the app.
+const PUBLIC_RECORDS = path.join(ROOT, "public/atlas-records.json");
 
-// Known EFF CSV endpoints. These often return 403 in automated environments;
-// failure here is non-fatal — we fall back to the manual-import path.
+// Known EFF CSV endpoints. Verified 2026-08-03 via curl with a descriptive
+// User-Agent: both return HTTP 200 / text/csv (~8.4MB, ~15k rows), headers
+// matching the committed data/raw/atlas-of-surveillance.csv exactly. (The
+// data-library page itself documents automated downloads as "often blocked
+// with HTTP 403" — that was not reproduced from this environment, but the
+// fallback chain below stays in place in case CI's egress is treated
+// differently.)
 const KNOWN_URLS = [
   "https://www.atlasofsurveillance.org/download.csv",
   "https://kiosk.atlasofsurveillance.org/download.csv",
 ];
+
+const REQUEST_TIMEOUT_MS = Number(process.env.SR_ATLAS_REQUEST_TIMEOUT_MS || 45_000);
+const TOTAL_BUDGET_MS = Number(process.env.SR_ATLAS_TOTAL_BUDGET_MS || 150_000);
+const START = Date.now();
 
 function manualImportMessage(): string {
   return [
@@ -35,39 +49,57 @@ function manualImportMessage(): string {
   ].join("\n");
 }
 
+async function fetchOnce(url: string): Promise<string | null> {
+  const res = await fetch(url, {
+    headers: { "User-Agent": "SurveillanceRadar/1.0 (+public-interest data visualization)" },
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status} from ${url}`);
+  const text = await res.text();
+  if (!text.includes(",")) throw new Error(`unexpected response body from ${url}`);
+  return text;
+}
+
+// Retry once per URL, then move to the next known endpoint. Non-fatal: the
+// caller falls back to the committed raw CSV, then the bundled sample.
 async function tryDownload(): Promise<string | null> {
   for (const url of KNOWN_URLS) {
-    try {
-      const res = await fetch(url, {
-        headers: { "User-Agent": "SurveillanceRadar/1.0 (+public-interest data visualization)" },
-        signal: AbortSignal.timeout(30000),
-      });
-      if (res.ok) {
-        const text = await res.text();
-        if (text.includes(",")) return text;
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      if (Date.now() - START > TOTAL_BUDGET_MS) {
+        console.warn("  (time budget reached — stopping live-download attempts)");
+        return null;
       }
-    } catch {
-      // ignore — try next / fall back to manual
+      try {
+        const text = await fetchOnce(url);
+        if (text) return text;
+      } catch (err) {
+        console.warn(`  (${url} attempt ${attempt} failed: ${(err as Error).message})`);
+        if (attempt === 1) await new Promise((r) => setTimeout(r, 2000));
+      }
     }
   }
   return null;
 }
 
-function resolveCsv(): Promise<{ csv: string; origin: string }> {
+function resolveCsv(): Promise<{ csv: string; origin: string; live: boolean }> {
   return (async () => {
-    if (fs.existsSync(RAW_CSV)) {
-      return { csv: fs.readFileSync(RAW_CSV, "utf8"), origin: "data/raw/atlas-of-surveillance.csv" };
-    }
+    // Try the live EFF download FIRST so a weekly re-run actually refreshes
+    // data instead of re-reading the same committed snapshot forever. Only
+    // written to disk (and only used) once a full, valid response comes
+    // back — a failed/partial download never touches the committed CSV.
     const downloaded = await tryDownload();
     if (downloaded) {
       fs.writeFileSync(RAW_CSV, downloaded);
-      return { csv: downloaded, origin: "EFF download" };
+      return { csv: downloaded, origin: "EFF live download", live: true };
+    }
+    if (fs.existsSync(RAW_CSV)) {
+      return { csv: fs.readFileSync(RAW_CSV, "utf8"), origin: "data/raw/atlas-of-surveillance.csv (committed snapshot)", live: false };
     }
     console.log(manualImportMessage());
     if (fs.existsSync(SAMPLE_CSV)) {
-      return { csv: fs.readFileSync(SAMPLE_CSV, "utf8"), origin: "bundled demo (sample-atlas.csv)" };
+      return { csv: fs.readFileSync(SAMPLE_CSV, "utf8"), origin: "bundled demo (sample-atlas.csv)", live: false };
     }
-    throw new Error("No CSV available (no raw, no download, no sample).");
+    throw new Error("No CSV available (no live download, no committed raw, no sample).");
   })();
 }
 
@@ -78,8 +110,27 @@ function topN(counts: Map<string, number>, n: number) {
     .map(([label, count]) => ({ label, count }));
 }
 
+function isoDate(d: Date): string {
+  return d.toISOString().slice(0, 10);
+}
+
+// The upstream CSV doesn't carry a reliable "last updated" header (HEAD
+// requests to atlasofsurveillance.org returned 503 when probed 2026-08-03),
+// so we track it ourselves: today's date when we successfully pulled live,
+// otherwise whatever was recorded on the last successful live pull.
+function resolveSourceLastUpdated(live: boolean): string {
+  if (live) return isoDate(new Date());
+  try {
+    const prev = JSON.parse(fs.readFileSync(OUT_SUMMARY, "utf8"));
+    if (typeof prev.sourceLastUpdated === "string") return prev.sourceLastUpdated;
+  } catch {
+    // no prior summary — fall through
+  }
+  return "unknown";
+}
+
 async function main() {
-  const { csv, origin } = await resolveCsv();
+  const { csv, origin, live } = await resolveCsv();
   console.log(`\nReading CSV from: ${origin}`);
 
   const parsed = Papa.parse<Record<string, string>>(csv, {
@@ -167,15 +218,21 @@ async function main() {
     topStates: topN(stateCounts, 10),
     topVendors: topN(vendorCounts, 10),
     attribution: "Data source: Electronic Frontier Foundation, Atlas of Surveillance (CC BY).",
+    license: "CC BY 4.0",
     sourceName: "EFF Atlas of Surveillance",
     sourceUrl: "https://www.atlasofsurveillance.org/data-library",
     methodologyUrl: "https://www.atlasofsurveillance.org/pages/methodology",
     licenseUrl: "https://www.eff.org/copyright",
-    sourceLastUpdated: "2026-04-08",
+    csvOrigin: origin,
+    live,
+    sourceLastUpdated: resolveSourceLastUpdated(live),
   };
 
   fs.mkdirSync(path.dirname(OUT_RECORDS), { recursive: true });
-  fs.writeFileSync(OUT_RECORDS, JSON.stringify(records));
+  fs.mkdirSync(path.dirname(PUBLIC_RECORDS), { recursive: true });
+  const recordsJson = JSON.stringify(records);
+  fs.writeFileSync(OUT_RECORDS, recordsJson);
+  fs.writeFileSync(PUBLIC_RECORDS, recordsJson);
   fs.writeFileSync(OUT_SUMMARY, JSON.stringify(summary, null, 2));
 
   console.log("\nImport summary");
@@ -187,7 +244,9 @@ async function main() {
   console.log(`  unique agencies:     ${summary.uniqueAgencies}`);
   console.log(`  unique technologies: ${summary.uniqueTechnologies}`);
   console.log(`  unique states:       ${summary.uniqueStates}`);
-  console.log(`\nWrote ${path.relative(ROOT, OUT_RECORDS)} and ${path.relative(ROOT, OUT_SUMMARY)}\n`);
+  console.log(
+    `\nWrote ${path.relative(ROOT, OUT_RECORDS)}, ${path.relative(ROOT, PUBLIC_RECORDS)} and ${path.relative(ROOT, OUT_SUMMARY)}\n`
+  );
 }
 
 main().catch((err) => {

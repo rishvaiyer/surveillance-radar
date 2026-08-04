@@ -29,40 +29,64 @@ not affiliated with or endorsed by EFF.
 **Absence of a marker does not mean absence of surveillance.** It may only mean an area has not
 been researched yet or the data has not been updated.
 
-### Additional open-data cross-reference layers
+### All data sources
 
-Two optional, **toggleable** layers (off by default) let you cross-reference the EFF deployments
-against other public open datasets. Each is ingested at build time and baked to a static file in
-`public/` — no runtime API dependency — exactly like the Atlas. Both ship with a small,
-clearly-labeled **sample file** so they render offline; the ingest scripts overwrite those files
-with live results when network is available. They are styled distinctly from the cyan EFF points
-and are toggled from the "Cross-reference layers" panel (top-right).
-
-| Layer | Source | Ingest | Static file | Marker | Attribution |
-|-------|--------|--------|-------------|--------|-------------|
-| OSM surveillance | OpenStreetMap via Overpass API (`node["man_made"="surveillance"]`, bounded to a small Washington, D.C. bbox) | `pnpm ingest:osm` | `public/osm-surveillance.geojson` | amber | © OpenStreetMap contributors (ODbL) |
-| Wikidata agencies | Wikidata SPARQL (law-enforcement agencies, `wdt:P31/P279* wd:Q1414557`, with coordinates `P625`) | `pnpm ingest:wikidata` | `public/wikidata-agencies.geojson` | violet | Wikidata (CC0) |
+| Source | License | Coverage | Ingest | Refresh |
+|--------|---------|----------|--------|---------|
+| [EFF Atlas of Surveillance](https://www.atlasofsurveillance.org/data-library) | CC BY 4.0 | ~15k U.S. law-enforcement surveillance deployments | `pnpm ingest:atlas` | Live download every run (falls back to committed CSV, then bundled demo CSV) |
+| [EFF "Data Driven" ALPR report](https://www.eff.org/pages/download-alpr-dataset) (2016-2017) | CC BY | ~200 agencies' automated license-plate-reader data-sharing stats | `pnpm ingest:alpr` | Historical, fixed-year dataset — no live endpoint; regenerated from the committed CSV |
+| [OpenStreetMap](https://www.openstreetmap.org/copyright) (Overpass API) | ODbL 1.0 | `man_made=surveillance` nodes across 24 curated world cities/regions | `pnpm ingest:osm` | Live Overpass query every run (falls back to committed sample) |
+| [Wikidata](https://www.wikidata.org/wiki/Wikidata:Licensing) (SPARQL / WDQS) | CC0 1.0 | Intelligence agencies (`wd:Q47913`) + law-enforcement agencies (`wd:Q732717`), worldwide, with coordinates | `pnpm ingest:wikidata` | Live SPARQL query every run (falls back to committed sample) |
+| [U.S. Census Gazetteer](https://www.census.gov/geographies/reference-files/time-series/geo/gazetteer-files.2025.html) (2025) | Public domain (U.S. government work) | City/county centroids used for offline Atlas geocoding | `pnpm ingest:centroids` | Regenerated from committed Census files (no live endpoint; annual Census release) |
 
 ```bash
-pnpm ingest:osm        # overwrites public/osm-surveillance.geojson (keeps sample if offline)
-pnpm ingest:wikidata   # overwrites public/wikidata-agencies.geojson (keeps sample if offline)
+pnpm ingest:all   # runs every ingest above, in dependency order
 ```
 
-Both ingest scripts use a bounded query + timeout and are **non-fatal on network failure**: if the
-endpoint is blocked or rate-limited they keep the committed sample file so the build always has
-data. The static files are loaded through the same `NEXT_PUBLIC_BASE_PATH` mechanism as
+`.github/workflows/refresh-data.yml` runs `pnpm run ingest:all` weekly (Wednesdays 05:23 UTC) and
+on demand, and commits any changed files under `data/` and `public/`.
+
+**Non-destructive by design:** every network-backed ingest script builds its result fully in
+memory first and only overwrites the committed file on success. A source that's unreachable, rate
+limited, or exceeds its time budget simply keeps the file already on disk — a failed or partial CI
+run never leaves a half-written or empty dataset. Each script uses a per-request timeout, retries
+once before giving up, and enforces a total wall-clock budget for the whole source.
+
+The OSM and Wikidata layers are optional, **toggleable** (off by default), and let you
+cross-reference EFF deployments against other public datasets. Each is baked to a static file in
+`public/` at ingest time — no runtime API dependency — exactly like the Atlas. Both ship with a
+small, clearly-labeled **sample file** (verified against Wikidata's own data — see note below) so
+they render offline before the first successful live ingest. They're styled distinctly from the
+cyan EFF points and toggled from the "Cross-reference layers" panel (top-right).
+
+> A previous version of this repo's Wikidata query used QID `Q1414557` for "law enforcement
+> agency" — that QID is actually **"nondisjunction"** (a genetics term) and silently returned zero
+> results. It's been corrected to `Q732717`. Verified 2026-08-03 against
+> `https://www.wikidata.org/wiki/Special:EntityData/Q732717.json`.
+
+The static files are loaded through the same `NEXT_PUBLIC_BASE_PATH` mechanism as
 `public/world.geojson`, so the layers work when served from a subpath (e.g. GitHub Pages).
 
 > These layers are independent open datasets, not part of — nor endorsed by — the EFF Atlas.
 
 ## How to use the real Atlas dataset
 
-The app ships with a small, clearly-labeled **demo dataset** (`data/raw/sample-atlas.csv`) so it
-runs out of the box. To use the real data:
+`pnpm ingest:atlas` tries a **live download** from the EFF Atlas of Surveillance first
+(`https://www.atlasofsurveillance.org/download.csv`, with a fallback mirror), so a normal run
+already refreshes the real dataset — this is what the weekly GitHub Actions workflow relies on.
+The data-library page itself warns that automated downloads are "often blocked with HTTP 403";
+that wasn't reproduced when probed on 2026-08-03 (verified `HTTP 200`, `text/csv`, ~8.4MB, headers
+matching the committed snapshot byte-for-byte), but if your network blocks it, the ingest falls
+back automatically, in order:
+
+1. Live download (writes `data/raw/atlas-of-surveillance.csv` on success).
+2. The committed `data/raw/atlas-of-surveillance.csv` snapshot, if present.
+3. The bundled demo dataset (`data/raw/sample-atlas.csv`).
+
+To force a manual import instead:
 
 1. Download the complete CSV from the EFF Atlas of Surveillance Data Library:
    https://atlasofsurveillance.org/pages/data-library
-   (Automated/direct downloads are often blocked with HTTP 403 — a manual download is expected.)
 2. Save it to `data/raw/atlas-of-surveillance.csv`.
 3. Run the ingest:
    ```bash
@@ -70,7 +94,8 @@ runs out of the box. To use the real data:
    ```
 
 The ingest script is **header-tolerant** (it maps common column-name variants), validates records
-with Zod, geocodes them, and writes `data/processed/atlas-records.json` + `atlas-summary.json`.
+with Zod, geocodes them, and writes `data/processed/atlas-records.json` + `atlas-summary.json` +
+`public/atlas-records.json` (the copy the running app actually fetches).
 
 ### Geocoding
 
@@ -85,7 +110,7 @@ table to improve coverage of smaller places.
 
 ```bash
 pnpm install
-pnpm ingest:atlas   # produces data/processed/*.json (uses demo data if no real CSV present)
+pnpm ingest:all     # refreshes every source (falls back to committed/bundled data if offline)
 pnpm dev            # http://localhost:3000
 ```
 
@@ -134,14 +159,19 @@ surveillance-radar/
     map/RecordDrawer.tsx   # detail panel
     layout/Footer.tsx      # disclaimer + attribution
   lib/atlas/               # schema (Zod), normalize, geocode, search, filters, theme
-  scripts/ingest-atlas.ts     # CSV -> normalized, geocoded, validated JSON
-  scripts/ingest-osm.ts       # Overpass -> public/osm-surveillance.geojson
-  scripts/ingest-wikidata.ts  # SPARQL -> public/wikidata-agencies.geojson
+  scripts/ingest-atlas.ts       # EFF CSV (live download w/ fallback) -> normalized, geocoded, validated JSON
+  scripts/ingest-eff-alpr.ts    # EFF "Data Driven" ALPR CSV -> data/processed + public/eff-data-driven-alpr.json
+  scripts/ingest-osm.ts         # Overpass (24 curated world regions) -> public/osm-surveillance.geojson
+  scripts/ingest-wikidata.ts    # SPARQL (intelligence + law-enforcement agencies) -> public/wikidata-agencies.geojson
+  scripts/ingest-census-centroids.ts  # Census Gazetteer -> data/centroids/us-places.json
+  .github/workflows/refresh-data.yml  # weekly + on-demand `pnpm run ingest:all`, commits changed data
   data/
     raw/                   # drop the real atlas-of-surveillance.csv here
     centroids/             # bundled offline centroid table
     processed/             # generated app data (committed)
   public/world.geojson              # bundled land outlines (no tile server needed)
+  public/atlas-records.json         # EFF Atlas records the app fetches (CC BY)
+  public/eff-data-driven-alpr.json  # EFF ALPR data-sharing records (CC BY)
   public/osm-surveillance.geojson   # OSM surveillance nodes (sample committed; ODbL)
   public/wikidata-agencies.geojson  # Wikidata agencies (sample committed; CC0)
 ```

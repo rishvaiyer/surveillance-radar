@@ -1,0 +1,44 @@
+name: Refresh surveillance data
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Weekly, off-peak: Wednesdays 05:23 UTC.
+    - cron: "23 5 * * 3"
+
+permissions:
+  contents: write
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Ingest all data sources
+        # Each ingest script is non-fatal on network failure for its own
+        # source and keeps the committed file if it can't refresh (see
+        # scripts/ingest-*.ts). A hard failure here means a source had no
+        # usable data at all — not even a committed fallback — which is
+        # worth failing the run for.
+        run: pnpm run ingest:all
+
+      - name: Commit refreshed data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data public/atlas-records.json public/eff-data-driven-alpr.json public/osm-surveillance.geojson public/wikidata-agencies.geojson
+          git diff --cached --quiet || git commit -m "Refresh surveillance data (weekly)"
+          git push

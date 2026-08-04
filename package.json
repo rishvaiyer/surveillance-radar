@@ -11,7 +11,8 @@
     "ingest:alpr": "tsx scripts/ingest-eff-alpr.ts",
     "ingest:centroids": "tsx scripts/ingest-census-centroids.ts",
     "ingest:osm": "tsx scripts/ingest-osm.ts",
-    "ingest:wikidata": "tsx scripts/ingest-wikidata.ts"
+    "ingest:wikidata": "tsx scripts/ingest-wikidata.ts",
+    "ingest:all": "pnpm run ingest:centroids && pnpm run ingest:atlas && pnpm run ingest:alpr && pnpm run ingest:osm && pnpm run ingest:wikidata"
   },
   "dependencies": {
     "maplibre-gl": "^5.24.0",
