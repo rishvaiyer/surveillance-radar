@@ -1,18 +1,18 @@
 {
-  "generatedAt": "2026-08-04T13:20:36.633Z",
-  "totalRecords": 15047,
+  "generatedAt": "2026-08-05T07:59:50.415Z",
+  "totalRecords": 15124,
   "skippedNoLocation": 21,
-  "skippedNoEvidence": 3,
+  "skippedNoEvidence": 5,
   "geocodeSources": {
     "csv": 0,
-    "city": 13093,
-    "county": 1830,
-    "state": 124
+    "city": 13160,
+    "county": 1833,
+    "state": 131
   },
-  "uniqueAgencies": 7730,
+  "uniqueAgencies": 7745,
   "uniqueTechnologies": 12,
   "uniqueStates": 51,
-  "recordsWithYear": 14039,
+  "recordsWithYear": 14114,
   "yearCoveragePct": 93.3,
   "technologies": [
     "Automated License Plate Readers",
@@ -84,61 +84,61 @@
   "topTechnologies": [
     {
       "label": "Body-worn Cameras",
-      "count": 5452
+      "count": 5456
     },
     {
       "label": "Automated License Plate Readers",
-      "count": 4082
+      "count": 4129
     },
     {
       "label": "Drones",
-      "count": 1803
+      "count": 1814
     },
     {
       "label": "Third-party Investigative Platforms",
-      "count": 1055
+      "count": 1061
     },
     {
       "label": "Face Recognition",
-      "count": 975
+      "count": 977
     },
     {
       "label": "Camera Registry",
-      "count": 755
+      "count": 756
     },
     {
       "label": "Gunshot Detection",
-      "count": 243
+      "count": 245
     },
     {
       "label": "Real-Time Crime Center",
-      "count": 238
+      "count": 241
     },
     {
       "label": "Predictive Policing",
       "count": 200
     },
     {
-      "label": "Cell-site Simulator",
-      "count": 83
+      "label": "Video Analytics",
+      "count": 84
     }
   ],
   "topStates": [
     {
       "label": "CA",
-      "count": 1082
+      "count": 1091
     },
     {
       "label": "NJ",
-      "count": 1048
+      "count": 1050
     },
     {
       "label": "FL",
-      "count": 937
+      "count": 943
     },
     {
       "label": "TX",
-      "count": 903
+      "count": 914
     },
     {
       "label": "IL",
@@ -146,41 +146,41 @@
     },
     {
       "label": "OH",
-      "count": 828
+      "count": 835
     },
     {
       "label": "MI",
-      "count": 717
+      "count": 719
     },
     {
       "label": "TN",
-      "count": 677
+      "count": 679
     },
     {
       "label": "MA",
-      "count": 605
+      "count": 606
     },
     {
       "label": "GA",
-      "count": 531
+      "count": 532
     }
   ],
   "topVendors": [
     {
       "label": "Flock Safety",
-      "count": 2706
+      "count": 2756
     },
     {
       "label": "Axon",
-      "count": 893
+      "count": 897
     },
     {
       "label": "SoundThinking",
-      "count": 796
+      "count": 797
     },
     {
       "label": "DJI",
-      "count": 662
+      "count": 663
     },
     {
       "label": "Idemia",
@@ -215,5 +215,5 @@
   "licenseUrl": "https://www.eff.org/copyright",
   "csvOrigin": "EFF live download",
   "live": true,
-  "sourceLastUpdated": "2026-08-04"
+  "sourceLastUpdated": "2026-08-05"
 }
