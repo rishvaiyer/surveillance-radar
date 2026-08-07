@@ -77,7 +77,7 @@ jobs:
         # `next export` step.
         run: pnpm build
         env:
-          # The portfolio serves this export from https://rishiyer.up.railway.app/radar/,
+          # The portfolio serves this export from https://rishva.up.railway.app/radar/,
           # so build it with that base path. next.config.js feeds this into both
           # basePath/assetPrefix and every runtime data fetch, which makes the
           # artifact drop-in deployable with no path rewriting afterwards.
