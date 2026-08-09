@@ -201,7 +201,7 @@ export default function MapExperience({
             </span>
           </div>
           <a href="/" className="mt-1 inline-block font-mono text-[12px] text-muted hover:text-signal hover:underline">
-            Built by Rish Iyer · Back to portfolio
+            Built by Rishva Iyer · Back to portfolio
           </a>
         </div>
         <div className="hidden sm:block">

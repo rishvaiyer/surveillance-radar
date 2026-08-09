@@ -65,7 +65,7 @@ export default function AlprNetwork({
               Lines show verified participation in the shared NVLS pool, not direct agency-to-agency relationships.
             </p>
             <a href="/" className="mt-2 inline-block font-mono text-[12px] text-signal hover:underline">
-              Built by Rish Iyer · View portfolio
+              Built by Rishva Iyer · View portfolio
             </a>
           </div>
           <div className="hidden text-right font-mono text-xs text-ink-2 sm:block">
