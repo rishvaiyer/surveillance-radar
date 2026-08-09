@@ -115,6 +115,20 @@ export default function Globe({
     mapRef.current = map;
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
 
+    // MapLibre measures the container at construction time. When it initializes
+    // before the container has a laid-out size (common on first paint), the
+    // canvas falls back to its 400x300 default and only self-corrects if the
+    // window later resizes — leaving the globe oversized and shoved into the
+    // top-left corner. Force a resize once layout has settled, and keep a
+    // ResizeObserver on the container so it stays correct.
+    const forceResize = () => map.resize();
+    requestAnimationFrame(() => requestAnimationFrame(forceResize));
+    const resizeObserver =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(() => map.resize())
+        : null;
+    if (resizeObserver && containerRef.current) resizeObserver.observe(containerRef.current);
+
     map.on("load", () => {
       // Soft blue atmosphere halo around the globe.
       try {
@@ -301,6 +315,9 @@ export default function Globe({
       wireInteractions(map);
       wireExtraInteractions(map);
       wireCountryInteraction(map);
+      // Belt-and-suspenders: ensure the canvas matches the container now that
+      // style + data are applied, in case the earlier rAF ran before layout.
+      map.resize();
       setReady(true);
     });
 
@@ -312,6 +329,7 @@ export default function Globe({
     map.on("dragstart", stopSpin);
 
     return () => {
+      resizeObserver?.disconnect();
       map.remove();
       mapRef.current = null;
     };
