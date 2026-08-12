@@ -125,6 +125,15 @@ keeps one latest point per EONET event rather than displaying a storm track as m
 incidents. The layer supplies geographic context only: overlap with a surveillance record does
 not establish a relationship or cause.
 
+### Pattern console
+
+The **Open pattern console** control turns the loaded snapshots into a compact evidence
+dashboard. It computes technology and NASA-category bars, source-year coverage, record/state/event
+metrics, and deterministic conclusion cards in the browser. Conclusions describe the observed
+coverage and explicitly avoid inferring causation, deployment intent, damage, or operational risk.
+The calculations use the currently filtered Atlas records plus the committed NASA EONET snapshot,
+so changing filters changes the dashboard without changing the underlying sources.
+
 ## How to use the real Atlas dataset
 
 `pnpm ingest:atlas` tries a **live download** from the EFF Atlas of Surveillance first
