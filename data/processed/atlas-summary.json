@@ -1,19 +1,19 @@
 {
-  "generatedAt": "2026-08-05T07:59:50.415Z",
-  "totalRecords": 15124,
-  "skippedNoLocation": 21,
-  "skippedNoEvidence": 5,
+  "generatedAt": "2026-08-12T06:50:11.616Z",
+  "totalRecords": 15137,
+  "skippedNoLocation": 22,
+  "skippedNoEvidence": 10,
   "geocodeSources": {
     "csv": 0,
-    "city": 13160,
-    "county": 1833,
-    "state": 131
+    "city": 13166,
+    "county": 1846,
+    "state": 125
   },
-  "uniqueAgencies": 7745,
+  "uniqueAgencies": 7748,
   "uniqueTechnologies": 12,
   "uniqueStates": 51,
-  "recordsWithYear": 14114,
-  "yearCoveragePct": 93.3,
+  "recordsWithYear": 14132,
+  "yearCoveragePct": 93.4,
   "technologies": [
     "Automated License Plate Readers",
     "Body-worn Cameras",
@@ -84,19 +84,19 @@
   "topTechnologies": [
     {
       "label": "Body-worn Cameras",
-      "count": 5456
+      "count": 5455
     },
     {
       "label": "Automated License Plate Readers",
-      "count": 4129
+      "count": 4140
     },
     {
       "label": "Drones",
-      "count": 1814
+      "count": 1816
     },
     {
       "label": "Third-party Investigative Platforms",
-      "count": 1061
+      "count": 1062
     },
     {
       "label": "Face Recognition",
@@ -126,19 +126,19 @@
   "topStates": [
     {
       "label": "CA",
-      "count": 1091
+      "count": 1088
     },
     {
       "label": "NJ",
-      "count": 1050
+      "count": 1048
     },
     {
       "label": "FL",
-      "count": 943
+      "count": 944
     },
     {
       "label": "TX",
-      "count": 914
+      "count": 912
     },
     {
       "label": "IL",
@@ -150,15 +150,15 @@
     },
     {
       "label": "MI",
-      "count": 719
+      "count": 716
     },
     {
       "label": "TN",
-      "count": 679
+      "count": 677
     },
     {
       "label": "MA",
-      "count": 606
+      "count": 632
     },
     {
       "label": "GA",
@@ -168,11 +168,11 @@
   "topVendors": [
     {
       "label": "Flock Safety",
-      "count": 2756
+      "count": 2742
     },
     {
       "label": "Axon",
-      "count": 897
+      "count": 899
     },
     {
       "label": "SoundThinking",
@@ -180,7 +180,7 @@
     },
     {
       "label": "DJI",
-      "count": 663
+      "count": 660
     },
     {
       "label": "Idemia",
@@ -188,7 +188,7 @@
     },
     {
       "label": "Motorola Solutions",
-      "count": 217
+      "count": 219
     },
     {
       "label": "CRIMEWATCH",
@@ -204,7 +204,7 @@
     },
     {
       "label": "LexisNexis",
-      "count": 136
+      "count": 137
     }
   ],
   "attribution": "Data source: Electronic Frontier Foundation, Atlas of Surveillance (CC BY).",
@@ -215,5 +215,5 @@
   "licenseUrl": "https://www.eff.org/copyright",
   "csvOrigin": "EFF live download",
   "live": true,
-  "sourceLastUpdated": "2026-08-05"
+  "sourceLastUpdated": "2026-08-12"
 }
