@@ -13,7 +13,8 @@
     "ingest:osm": "tsx scripts/ingest-osm.ts",
     "ingest:wikidata": "tsx scripts/ingest-wikidata.ts",
     "ingest:usaspending": "tsx scripts/ingest-usaspending.ts",
-    "ingest:all": "pnpm run ingest:centroids && pnpm run ingest:atlas && pnpm run ingest:alpr && pnpm run ingest:osm && pnpm run ingest:wikidata && pnpm run ingest:usaspending"
+    "ingest:nasa": "tsx scripts/ingest-nasa-eonet.ts",
+    "ingest:all": "pnpm run ingest:centroids && pnpm run ingest:atlas && pnpm run ingest:alpr && pnpm run ingest:osm && pnpm run ingest:wikidata && pnpm run ingest:usaspending && pnpm run ingest:nasa"
   },
   "dependencies": {
     "maplibre-gl": "^5.24.0",

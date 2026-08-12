@@ -3,7 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import maplibregl, { type GeoJSONSource, type Map as MLMap } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { THEME, techColor, techColorMatchExpression } from "../../lib/atlas/theme";
+import {
+  NASA_CATEGORY_COLORS,
+  THEME,
+  nasaCategoryColorExpression,
+  techColor,
+  techColorMatchExpression,
+} from "../../lib/atlas/theme";
 import type { MapRecord } from "../../lib/atlas/schema";
 import type { ClickedCountry } from "../../lib/geo/countryLookup";
 
@@ -48,6 +54,7 @@ function toFeatureCollection(records: MapRecord[]) {
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH || "";
 const TECH_COLOR = techColorMatchExpression() as any;
+const NASA_EVENT_COLOR = nasaCategoryColorExpression() as any;
 const REDUCED_MOTION =
   typeof window !== "undefined" &&
   window.matchMedia &&
@@ -82,6 +89,7 @@ export default function Globe({
   showOsm,
   showWikidata,
   showProcurement,
+  showNasa,
   onCountryClick,
 }: {
   records: MapRecord[];
@@ -89,6 +97,7 @@ export default function Globe({
   showOsm: boolean;
   showWikidata: boolean;
   showProcurement: boolean;
+  showNasa: boolean;
   onCountryClick: (country: ClickedCountry) => void;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -312,6 +321,34 @@ export default function Globe({
         },
       });
 
+      // NASA EONET current natural events. These are environmental context,
+      // not surveillance records and not evidence of any causal relationship.
+      map.addSource("nasa-eonet", { type: "geojson", data: `${BASE}/nasa-eonet-events.geojson` });
+      map.addLayer({
+        id: "nasa-event-glow",
+        type: "circle",
+        source: "nasa-eonet",
+        layout: { visibility: "none" },
+        paint: {
+          "circle-color": NASA_EVENT_COLOR,
+          "circle-blur": 1,
+          "circle-opacity": 0.5,
+          "circle-radius": 13,
+        },
+      });
+      map.addLayer({
+        id: "nasa-event-core",
+        type: "circle",
+        source: "nasa-eonet",
+        layout: { visibility: "none" },
+        paint: {
+          "circle-color": NASA_EVENT_COLOR,
+          "circle-radius": 5,
+          "circle-stroke-color": "#fff3e8",
+          "circle-stroke-width": 1.2,
+        },
+      });
+
       wireInteractions(map);
       wireExtraInteractions(map);
       wireCountryInteraction(map);
@@ -475,6 +512,34 @@ export default function Globe({
       );
     });
     map.on("mouseleave", "wikidata-core", hide);
+
+    map.on("mousemove", "nasa-event-core", (e) => {
+      const p = e.features?.[0]?.properties as {
+        title?: string;
+        category?: string;
+        categoryId?: string;
+        date?: string;
+        magnitude?: string;
+        sourceName?: string;
+      };
+      const color = NASA_CATEGORY_COLORS[p.categoryId || ""] || THEME.nasa;
+      const date = p.date ? new Date(p.date).toLocaleDateString(undefined, { dateStyle: "medium" }) : "";
+      const details = [p.category, date, p.magnitude]
+        .filter((value): value is string => Boolean(value))
+        .map(escapeHtml)
+        .join(" · ");
+      showPopup(
+        e,
+        `<div class="sr-popup">
+           <div class="sr-popup-title"><span class="sr-chip" style="background:${color};color:${color}"></span>${escapeHtml(
+             p.title || "Natural event"
+           )}</div>
+           <div class="sr-sub">${details}</div>
+           <div class="sr-attr">NASA EONET${p.sourceName ? ` · source: ${escapeHtml(p.sourceName)}` : ""}</div>
+         </div>`
+      );
+    });
+    map.on("mouseleave", "nasa-event-core", hide);
   }
 
   // Click a country's landmass (the "land" fill layer, from world.geojson) to
@@ -514,7 +579,9 @@ export default function Globe({
     set("wikidata-core", showWikidata);
     set("procurement-fill", showProcurement);
     set("procurement-ring", showProcurement);
-  }, [showOsm, showWikidata, showProcurement, ready]);
+    set("nasa-event-glow", showNasa);
+    set("nasa-event-core", showNasa);
+  }, [showOsm, showWikidata, showProcurement, showNasa, ready]);
 
   // Keep the GeoJSON source in sync with filtered records.
   useEffect(() => {

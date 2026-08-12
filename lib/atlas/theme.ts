@@ -24,9 +24,35 @@ export const THEME = {
   wikidataBright: "#b5d1ff",
   procurement: "#57f2a3", // mint — federal procurement research via USAspending
   procurementBright: "#b6ffdb",
+  nasa: "#ff8a3d", // orange — NASA EONET natural events
+  nasaBright: "#ffd0a8",
   uiText: "#dbe6f2",
   uiMuted: "#7d8ba0",
 } as const;
+
+export const NASA_CATEGORY_COLORS: Record<string, string> = {
+  wildfires: "#ff713d",
+  severeStorms: "#ff5da2",
+  volcanoes: "#ff4d4d",
+  floods: "#4da3ff",
+  dustHaze: "#d9ad6a",
+  landslides: "#d9963d",
+  seaLakeIce: "#8ee9ff",
+  snow: "#d7f5ff",
+  earthquakes: "#d88cff",
+  waterColor: "#45d5c4",
+  tempExtremes: "#ffb347",
+  manmade: "#b7bdc8",
+};
+
+export function nasaCategoryColorExpression(): unknown[] {
+  const expression: unknown[] = ["match", ["get", "categoryId"]];
+  for (const [category, color] of Object.entries(NASA_CATEGORY_COLORS)) {
+    expression.push(category, color);
+  }
+  expression.push(THEME.nasa);
+  return expression;
+}
 
 // Per-technology categorical color ramp. Hues are spread across the wheel and kept
 // bright/saturated so every point glows legibly on the near-black space background.

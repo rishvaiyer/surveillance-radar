@@ -10,19 +10,23 @@ export default function LayerToggles({
   showOsm,
   showWikidata,
   showProcurement,
+  showNasa,
   onToggleOsm,
   onToggleWikidata,
   onToggleProcurement,
+  onToggleNasa,
 }: {
   showOsm: boolean;
   showWikidata: boolean;
   showProcurement: boolean;
+  showNasa: boolean;
   onToggleOsm: () => void;
   onToggleWikidata: () => void;
   onToggleProcurement: () => void;
+  onToggleNasa: () => void;
 }) {
   const [open, setOpen] = useState(false);
-  const activeCount = Number(showOsm) + Number(showWikidata) + Number(showProcurement);
+  const activeCount = Number(showOsm) + Number(showWikidata) + Number(showProcurement) + Number(showNasa);
 
   return (
     <div className="absolute right-4 top-20 z-20 sm:top-24">
@@ -37,6 +41,7 @@ export default function LayerToggles({
           <span className="h-1.5 w-1.5 rounded-full" style={{ background: THEME.osm }} />
           <span className="h-1.5 w-1.5 rounded-full" style={{ background: THEME.wikidata }} />
           <span className="h-1.5 w-1.5 rounded-full" style={{ background: THEME.procurement }} />
+          <span className="h-1.5 w-1.5 rounded-full" style={{ background: THEME.nasa }} />
         </span>
         Layers{activeCount > 0 ? ` · ${activeCount}` : ""}
       </button>
@@ -68,9 +73,18 @@ export default function LayerToggles({
             attribution="USAspending.gov · public domain"
             note="Award dollars by state. Purchasing evidence, not confirmed deployment."
           />
+          <LayerRow
+            on={showNasa}
+            onToggle={onToggleNasa}
+            color={THEME.nasa}
+            secondColor="#4da3ff"
+            title="NASA Earth events"
+            attribution="NASA EONET"
+            note="Current curated wildfires, storms, volcanoes, floods, and other natural events. Geographic context only."
+          />
 
           <p className="mt-3 border-t border-edge pt-3 text-[12px] leading-relaxed text-faint">
-            Layers are independent cross-references. Community-mapped locations may be incomplete or outdated.
+            Layers are independent cross-references. Geographic overlap does not imply a relationship. Locations may be incomplete or outdated.
           </p>
         </div>
       )}
