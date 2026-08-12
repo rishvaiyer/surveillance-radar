@@ -40,6 +40,7 @@ been researched yet or the data has not been updated.
 | [USAspending.gov](https://api.usaspending.gov/) | Public domain (U.S. government work) | DHS + DOJ prime contract awards to surveillance-technology vendors, by state | `pnpm ingest:usaspending` | Live API query every run (falls back to committed snapshot) |
 | [Wikidata](https://www.wikidata.org/wiki/Wikidata:Licensing) (SPARQL / WDQS) | CC0 1.0 | Intelligence agencies (`wd:Q47913`) + law-enforcement agencies (`wd:Q732717`), worldwide, with coordinates | `pnpm ingest:wikidata` | Live SPARQL query every run (falls back to committed sample) |
 | [NASA EONET](https://eonet.gsfc.nasa.gov/) | NASA open data | Currently open, curated natural events worldwide | `pnpm ingest:nasa` | Live API query every run (falls back to committed snapshot) |
+| [PeeringDB](https://www.peeringdb.com/) | Public facility data | Known interconnection facilities with coordinates, worldwide | `pnpm ingest:peeringdb` | Live API query every run (falls back to committed snapshot) |
 | [U.S. Census Gazetteer](https://www.census.gov/geographies/reference-files/time-series/geo/gazetteer-files.2025.html) (2025) | Public domain (U.S. government work) | City/county centroids used for offline Atlas geocoding | `pnpm ingest:centroids` | Regenerated from committed Census files (no live endpoint; annual Census release) |
 
 ```bash
@@ -133,6 +134,13 @@ metrics, and deterministic conclusion cards in the browser. Conclusions describe
 coverage and explicitly avoid inferring causation, deployment intent, damage, or operational risk.
 The calculations use the currently filtered Atlas records plus the committed NASA EONET snapshot,
 so changing filters changes the dashboard without changing the underlying sources.
+
+The console also includes a side-by-side coverage comparison with the PeeringDB facility snapshot.
+The optional **Mapped facilities** layer shows known public PeeringDB facility points in violet and
+popups include the facility, operator, city/country, and listed network or exchange counts. This is
+an infrastructure context layer, not a complete datacenter inventory. Street addresses, contacts,
+traffic, access paths, and operational details are not included. Facility proximity or co-location
+with an Atlas point does not establish a relationship, hosting claim, cause, or risk.
 
 ## How to use the real Atlas dataset
 

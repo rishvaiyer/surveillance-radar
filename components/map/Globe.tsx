@@ -83,6 +83,20 @@ const PROCUREMENT_RADIUS = [
   34,
 ] as any;
 
+// Facility circles use the number of listed networks as a gentle size cue,
+// while keeping small sites visible at globe zoom.
+const FACILITY_RADIUS = [
+  "interpolate",
+  ["linear"],
+  ["sqrt", ["max", ["get", "netCount"], 1]],
+  1,
+  3.5,
+  8,
+  6,
+  24,
+  10,
+] as any;
+
 export default function Globe({
   records,
   onSelect,
@@ -90,6 +104,7 @@ export default function Globe({
   showWikidata,
   showProcurement,
   showNasa,
+  showFacilities,
   onCountryClick,
 }: {
   records: MapRecord[];
@@ -98,6 +113,7 @@ export default function Globe({
   showWikidata: boolean;
   showProcurement: boolean;
   showNasa: boolean;
+  showFacilities: boolean;
   onCountryClick: (country: ClickedCountry) => void;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -173,6 +189,35 @@ export default function Globe({
           "circle-blur": 1,
           "circle-opacity": 0.35,
           "circle-radius": ["step", ["get", "point_count"], 18, 10, 26, 50, 36],
+        },
+      });
+
+      // PeeringDB public facility locations. This is an independent context
+      // layer: known interconnection facilities, not a complete datacenter
+      // inventory or an operational-risk map.
+      map.addSource("peeringdb", { type: "geojson", data: `${BASE}/peeringdb-facilities.geojson` });
+      map.addLayer({
+        id: "peeringdb-glow",
+        type: "circle",
+        source: "peeringdb",
+        layout: { visibility: "none" },
+        paint: {
+          "circle-color": THEME.facilities,
+          "circle-blur": 1,
+          "circle-opacity": 0.5,
+          "circle-radius": ["+", FACILITY_RADIUS, 5] as any,
+        },
+      });
+      map.addLayer({
+        id: "peeringdb-core",
+        type: "circle",
+        source: "peeringdb",
+        layout: { visibility: "none" },
+        paint: {
+          "circle-color": THEME.facilitiesBright,
+          "circle-radius": FACILITY_RADIUS,
+          "circle-stroke-color": THEME.facilities,
+          "circle-stroke-width": 1.4,
         },
       });
       map.addLayer({
@@ -540,6 +585,35 @@ export default function Globe({
       );
     });
     map.on("mouseleave", "nasa-event-core", hide);
+
+    map.on("mousemove", "peeringdb-core", (e) => {
+      const p = e.features?.[0]?.properties as {
+        name?: string;
+        operator?: string;
+        city?: string;
+        state?: string;
+        country?: string;
+        netCount?: string | number;
+        ixCount?: string | number;
+      };
+      const location = [p.city, p.state, p.country].filter(Boolean).join(", ");
+      const footprint = [
+        p.netCount ? `${Number(p.netCount).toLocaleString()} networks` : "",
+        p.ixCount ? `${Number(p.ixCount).toLocaleString()} IXs` : "",
+      ].filter(Boolean).join(" · ");
+      showPopup(
+        e,
+        `<div class="sr-popup">
+           <div class="sr-popup-title"><span class="sr-chip" style="background:${THEME.facilities};color:${THEME.facilities}"></span>${escapeHtml(
+             p.name || "Mapped facility"
+           )}</div>
+           <div class="sr-sub">${escapeHtml([p.operator, location].filter(Boolean).join(" · "))}</div>
+           ${footprint ? `<div class="sr-sub">${escapeHtml(footprint)}</div>` : ""}
+           <div class="sr-attr">PeeringDB · known mapped facility, not complete inventory</div>
+         </div>`
+      );
+    });
+    map.on("mouseleave", "peeringdb-core", hide);
   }
 
   // Click a country's landmass (the "land" fill layer, from world.geojson) to
@@ -581,7 +655,9 @@ export default function Globe({
     set("procurement-ring", showProcurement);
     set("nasa-event-glow", showNasa);
     set("nasa-event-core", showNasa);
-  }, [showOsm, showWikidata, showProcurement, showNasa, ready]);
+    set("peeringdb-glow", showFacilities);
+    set("peeringdb-core", showFacilities);
+  }, [showOsm, showWikidata, showProcurement, showNasa, showFacilities, ready]);
 
   // Keep the GeoJSON source in sync with filtered records.
   useEffect(() => {

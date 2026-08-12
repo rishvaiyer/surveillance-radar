@@ -11,22 +11,26 @@ export default function LayerToggles({
   showWikidata,
   showProcurement,
   showNasa,
+  showFacilities,
   onToggleOsm,
   onToggleWikidata,
   onToggleProcurement,
   onToggleNasa,
+  onToggleFacilities,
 }: {
   showOsm: boolean;
   showWikidata: boolean;
   showProcurement: boolean;
   showNasa: boolean;
+  showFacilities: boolean;
   onToggleOsm: () => void;
   onToggleWikidata: () => void;
   onToggleProcurement: () => void;
   onToggleNasa: () => void;
+  onToggleFacilities: () => void;
 }) {
   const [open, setOpen] = useState(false);
-  const activeCount = Number(showOsm) + Number(showWikidata) + Number(showProcurement) + Number(showNasa);
+  const activeCount = Number(showOsm) + Number(showWikidata) + Number(showProcurement) + Number(showNasa) + Number(showFacilities);
 
   return (
     <div className="absolute right-4 top-20 z-20 sm:top-24">
@@ -42,6 +46,7 @@ export default function LayerToggles({
           <span className="h-1.5 w-1.5 rounded-full" style={{ background: THEME.wikidata }} />
           <span className="h-1.5 w-1.5 rounded-full" style={{ background: THEME.procurement }} />
           <span className="h-1.5 w-1.5 rounded-full" style={{ background: THEME.nasa }} />
+          <span className="h-1.5 w-1.5 rounded-full" style={{ background: THEME.facilities }} />
         </span>
         Layers{activeCount > 0 ? ` · ${activeCount}` : ""}
       </button>
@@ -81,6 +86,14 @@ export default function LayerToggles({
             title="NASA Earth events"
             attribution="NASA EONET"
             note="Current curated wildfires, storms, volcanoes, floods, and other natural events. Geographic context only."
+          />
+          <LayerRow
+            on={showFacilities}
+            onToggle={onToggleFacilities}
+            color={THEME.facilities}
+            title="Mapped facilities"
+            attribution="PeeringDB · public facility data"
+            note="Known interconnection facilities, not a complete datacenter inventory."
           />
 
           <p className="mt-3 border-t border-edge pt-3 text-[12px] leading-relaxed text-faint">

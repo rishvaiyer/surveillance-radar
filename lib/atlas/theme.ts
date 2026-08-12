@@ -26,6 +26,8 @@ export const THEME = {
   procurementBright: "#b6ffdb",
   nasa: "#ff8a3d", // orange — NASA EONET natural events
   nasaBright: "#ffd0a8",
+  facilities: "#d47cff", // violet — public PeeringDB facility locations
+  facilitiesBright: "#f0c8ff",
   uiText: "#dbe6f2",
   uiMuted: "#7d8ba0",
 } as const;

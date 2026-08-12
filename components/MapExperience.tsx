@@ -53,6 +53,17 @@ type NasaEvent = {
   };
 };
 
+type FacilityFeature = {
+  properties?: {
+    name?: string;
+    operator?: string;
+    city?: string;
+    country?: string;
+    netCount?: number;
+    ixCount?: number;
+  };
+};
+
 export default function MapExperience({
   summary,
 }: {
@@ -70,11 +81,13 @@ export default function MapExperience({
   const [showWikidata, setShowWikidata] = useState(false);
   const [showProcurement, setShowProcurement] = useState(false);
   const [showNasa, setShowNasa] = useState(false);
+  const [showFacilities, setShowFacilities] = useState(false);
   // Country/region breakdown panel (opened by clicking a country on the globe).
   const [selectedCountry, setSelectedCountry] = useState<ClickedCountry | null>(null);
   const [osmFeatures, setOsmFeatures] = useState<PointFeature[]>([]);
   const [wikidataFeatures, setWikidataFeatures] = useState<PointFeature[]>([]);
   const [nasaEvents, setNasaEvents] = useState<NasaEvent[]>([]);
+  const [facilities, setFacilities] = useState<FacilityFeature[]>([]);
 
   const filtered = useMemo(() => applyFilters(records, filters), [records, filters]);
   const yearCoverage = useMemo(() => {
@@ -135,12 +148,14 @@ export default function MapExperience({
       fetch(`${base}/osm-surveillance.geojson`).then((r) => (r.ok ? r.json() : null)),
       fetch(`${base}/wikidata-agencies.geojson`).then((r) => (r.ok ? r.json() : null)),
       fetch(`${base}/nasa-eonet-events.geojson`).then((r) => (r.ok ? r.json() : null)),
+      fetch(`${base}/peeringdb-facilities.geojson`).then((r) => (r.ok ? r.json() : null)),
     ])
-      .then(([osm, wikidata, nasa]) => {
+      .then(([osm, wikidata, nasa, peeringdb]) => {
         if (!active) return;
         if (osm?.features) setOsmFeatures(osm.features);
         if (wikidata?.features) setWikidataFeatures(wikidata.features);
         if (nasa?.features) setNasaEvents(nasa.features);
+        if (peeringdb?.features) setFacilities(peeringdb.features);
       })
       .catch(() => {
         // Non-fatal: the country panel just reports 0 for these layers.
@@ -183,6 +198,7 @@ export default function MapExperience({
         showWikidata={showWikidata}
         showProcurement={showProcurement}
         showNasa={showNasa}
+        showFacilities={showFacilities}
         onCountryClick={handleCountryClick}
       />
 
@@ -265,10 +281,12 @@ export default function MapExperience({
         showWikidata={showWikidata}
         showProcurement={showProcurement}
         showNasa={showNasa}
+        showFacilities={showFacilities}
         onToggleOsm={() => setShowOsm((value) => !value)}
         onToggleWikidata={() => setShowWikidata((value) => !value)}
         onToggleProcurement={() => setShowProcurement((value) => !value)}
         onToggleNasa={() => setShowNasa((value) => !value)}
+        onToggleFacilities={() => setShowFacilities((value) => !value)}
       />
 
       {listView && <RecordList records={filtered} onSelect={(record) => selectRecords([record])} />}
@@ -277,6 +295,7 @@ export default function MapExperience({
         <PatternsPanel
           records={filtered}
           nasaEvents={nasaEvents}
+          facilities={facilities}
           onClose={() => setPatternsView(false)}
         />
       )}
