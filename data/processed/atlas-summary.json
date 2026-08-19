@@ -1,18 +1,18 @@
 {
-  "generatedAt": "2026-08-12T06:50:11.616Z",
-  "totalRecords": 15137,
+  "generatedAt": "2026-08-19T05:53:41.442Z",
+  "totalRecords": 15153,
   "skippedNoLocation": 22,
   "skippedNoEvidence": 10,
   "geocodeSources": {
     "csv": 0,
-    "city": 13166,
+    "city": 13182,
     "county": 1846,
     "state": 125
   },
   "uniqueAgencies": 7748,
   "uniqueTechnologies": 12,
   "uniqueStates": 51,
-  "recordsWithYear": 14132,
+  "recordsWithYear": 14147,
   "yearCoveragePct": 93.4,
   "technologies": [
     "Automated License Plate Readers",
@@ -84,15 +84,15 @@
   "topTechnologies": [
     {
       "label": "Body-worn Cameras",
-      "count": 5455
+      "count": 5456
     },
     {
       "label": "Automated License Plate Readers",
-      "count": 4140
+      "count": 4141
     },
     {
       "label": "Drones",
-      "count": 1816
+      "count": 1826
     },
     {
       "label": "Third-party Investigative Platforms",
@@ -100,7 +100,7 @@
     },
     {
       "label": "Face Recognition",
-      "count": 977
+      "count": 980
     },
     {
       "label": "Camera Registry",
@@ -112,7 +112,7 @@
     },
     {
       "label": "Real-Time Crime Center",
-      "count": 241
+      "count": 242
     },
     {
       "label": "Predictive Policing",
@@ -126,11 +126,11 @@
   "topStates": [
     {
       "label": "CA",
-      "count": 1088
+      "count": 1089
     },
     {
       "label": "NJ",
-      "count": 1048
+      "count": 1049
     },
     {
       "label": "FL",
@@ -138,15 +138,15 @@
     },
     {
       "label": "TX",
-      "count": 912
+      "count": 913
     },
     {
       "label": "IL",
-      "count": 862
+      "count": 863
     },
     {
       "label": "OH",
-      "count": 835
+      "count": 836
     },
     {
       "label": "MI",
@@ -168,11 +168,11 @@
   "topVendors": [
     {
       "label": "Flock Safety",
-      "count": 2742
+      "count": 2744
     },
     {
       "label": "Axon",
-      "count": 899
+      "count": 900
     },
     {
       "label": "SoundThinking",
@@ -188,7 +188,7 @@
     },
     {
       "label": "Motorola Solutions",
-      "count": 219
+      "count": 220
     },
     {
       "label": "CRIMEWATCH",
@@ -215,5 +215,5 @@
   "licenseUrl": "https://www.eff.org/copyright",
   "csvOrigin": "EFF live download",
   "live": true,
-  "sourceLastUpdated": "2026-08-12"
+  "sourceLastUpdated": "2026-08-19"
 }
