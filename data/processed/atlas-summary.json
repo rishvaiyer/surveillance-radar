@@ -1,18 +1,18 @@
 {
-  "generatedAt": "2026-08-19T05:53:41.442Z",
-  "totalRecords": 15153,
+  "generatedAt": "2026-08-26T05:56:44.731Z",
+  "totalRecords": 15154,
   "skippedNoLocation": 22,
   "skippedNoEvidence": 10,
   "geocodeSources": {
     "csv": 0,
-    "city": 13182,
+    "city": 13183,
     "county": 1846,
     "state": 125
   },
   "uniqueAgencies": 7748,
   "uniqueTechnologies": 12,
   "uniqueStates": 51,
-  "recordsWithYear": 14147,
+  "recordsWithYear": 14148,
   "yearCoveragePct": 93.4,
   "technologies": [
     "Automated License Plate Readers",
@@ -84,7 +84,7 @@
   "topTechnologies": [
     {
       "label": "Body-worn Cameras",
-      "count": 5456
+      "count": 5457
     },
     {
       "label": "Automated License Plate Readers",
@@ -138,7 +138,7 @@
     },
     {
       "label": "TX",
-      "count": 913
+      "count": 914
     },
     {
       "label": "IL",
@@ -215,5 +215,5 @@
   "licenseUrl": "https://www.eff.org/copyright",
   "csvOrigin": "EFF live download",
   "live": true,
-  "sourceLastUpdated": "2026-08-19"
+  "sourceLastUpdated": "2026-08-26"
 }
