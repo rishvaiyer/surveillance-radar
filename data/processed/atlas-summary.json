@@ -1,18 +1,18 @@
 {
-  "generatedAt": "2026-08-26T05:56:44.731Z",
-  "totalRecords": 15154,
+  "generatedAt": "2026-09-02T09:45:41.339Z",
+  "totalRecords": 15155,
   "skippedNoLocation": 22,
   "skippedNoEvidence": 10,
   "geocodeSources": {
     "csv": 0,
-    "city": 13183,
+    "city": 13184,
     "county": 1846,
     "state": 125
   },
   "uniqueAgencies": 7748,
   "uniqueTechnologies": 12,
   "uniqueStates": 51,
-  "recordsWithYear": 14148,
+  "recordsWithYear": 14149,
   "yearCoveragePct": 93.4,
   "technologies": [
     "Automated License Plate Readers",
@@ -88,7 +88,7 @@
     },
     {
       "label": "Automated License Plate Readers",
-      "count": 4141
+      "count": 4142
     },
     {
       "label": "Drones",
@@ -134,7 +134,7 @@
     },
     {
       "label": "FL",
-      "count": 944
+      "count": 945
     },
     {
       "label": "TX",
@@ -168,7 +168,7 @@
   "topVendors": [
     {
       "label": "Flock Safety",
-      "count": 2744
+      "count": 2746
     },
     {
       "label": "Axon",
@@ -188,7 +188,7 @@
     },
     {
       "label": "Motorola Solutions",
-      "count": 220
+      "count": 222
     },
     {
       "label": "CRIMEWATCH",
@@ -215,5 +215,5 @@
   "licenseUrl": "https://www.eff.org/copyright",
   "csvOrigin": "EFF live download",
   "live": true,
-  "sourceLastUpdated": "2026-08-26"
+  "sourceLastUpdated": "2026-09-02"
 }
