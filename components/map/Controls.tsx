@@ -13,6 +13,8 @@ export default function Controls({
   onToggleList,
   networkView,
   onToggleNetwork,
+  patternsView,
+  onTogglePatterns,
 }: {
   filters: Filters;
   onChange: (f: Filters) => void;
@@ -23,6 +25,8 @@ export default function Controls({
   onToggleList: () => void;
   networkView: boolean;
   onToggleNetwork: () => void;
+  patternsView: boolean;
+  onTogglePatterns: () => void;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const set = (patch: Partial<Filters>) => onChange({ ...filters, ...patch });
@@ -130,6 +134,16 @@ export default function Controls({
         className="mt-2 w-full rounded-md border border-amber-400/30 px-3 py-2 text-xs text-amber-300 hover:border-amber-300"
       >
         {networkView ? "Return to globe" : "Explore ALPR sharing"}
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          onTogglePatterns();
+          setMobileOpen(false);
+        }}
+        className="mt-2 w-full rounded-md border border-signal/30 px-3 py-2 text-xs text-signal hover:border-signal"
+      >
+        {patternsView ? "Hide pattern console" : "Open pattern console"}
       </button>
       </div>
     </>

@@ -13,6 +13,7 @@ import AlprNetwork from "./map/AlprNetwork";
 import LayerToggles from "./map/LayerToggles";
 import TimeSlider from "./map/TimeSlider";
 import CountryPanel from "./map/CountryPanel";
+import PatternsPanel from "./PatternsPanel";
 import { applyFilters, EMPTY_FILTERS, type Filters } from "../lib/atlas/filters";
 import type { MapRecord } from "../lib/atlas/schema";
 import type { ClickedCountry } from "../lib/geo/countryLookup";
@@ -44,6 +45,25 @@ type PointFeature = {
   geometry: { type: string; coordinates: [number, number] };
 };
 
+type NasaEvent = {
+  properties?: {
+    categoryId?: string;
+    title?: string;
+    closed?: string | null;
+  };
+};
+
+type FacilityFeature = {
+  properties?: {
+    name?: string;
+    operator?: string;
+    city?: string;
+    country?: string;
+    netCount?: number;
+    ixCount?: number;
+  };
+};
+
 export default function MapExperience({
   summary,
 }: {
@@ -56,13 +76,18 @@ export default function MapExperience({
   const [selected, setSelected] = useState<MapRecord[] | null>(null);
   const [listView, setListView] = useState(false);
   const [networkView, setNetworkView] = useState(false);
+  const [patternsView, setPatternsView] = useState(false);
   const [showOsm, setShowOsm] = useState(false);
   const [showWikidata, setShowWikidata] = useState(false);
   const [showProcurement, setShowProcurement] = useState(false);
+  const [showNasa, setShowNasa] = useState(false);
+  const [showFacilities, setShowFacilities] = useState(false);
   // Country/region breakdown panel (opened by clicking a country on the globe).
   const [selectedCountry, setSelectedCountry] = useState<ClickedCountry | null>(null);
   const [osmFeatures, setOsmFeatures] = useState<PointFeature[]>([]);
   const [wikidataFeatures, setWikidataFeatures] = useState<PointFeature[]>([]);
+  const [nasaEvents, setNasaEvents] = useState<NasaEvent[]>([]);
+  const [facilities, setFacilities] = useState<FacilityFeature[]>([]);
 
   const filtered = useMemo(() => applyFilters(records, filters), [records, filters]);
   const yearCoverage = useMemo(() => {
@@ -122,11 +147,15 @@ export default function MapExperience({
     Promise.all([
       fetch(`${base}/osm-surveillance.geojson`).then((r) => (r.ok ? r.json() : null)),
       fetch(`${base}/wikidata-agencies.geojson`).then((r) => (r.ok ? r.json() : null)),
+      fetch(`${base}/nasa-eonet-events.geojson`).then((r) => (r.ok ? r.json() : null)),
+      fetch(`${base}/peeringdb-facilities.geojson`).then((r) => (r.ok ? r.json() : null)),
     ])
-      .then(([osm, wikidata]) => {
+      .then(([osm, wikidata, nasa, peeringdb]) => {
         if (!active) return;
         if (osm?.features) setOsmFeatures(osm.features);
         if (wikidata?.features) setWikidataFeatures(wikidata.features);
+        if (nasa?.features) setNasaEvents(nasa.features);
+        if (peeringdb?.features) setFacilities(peeringdb.features);
       })
       .catch(() => {
         // Non-fatal: the country panel just reports 0 for these layers.
@@ -168,6 +197,8 @@ export default function MapExperience({
         showOsm={showOsm}
         showWikidata={showWikidata}
         showProcurement={showProcurement}
+        showNasa={showNasa}
+        showFacilities={showFacilities}
         onCountryClick={handleCountryClick}
       />
 
@@ -229,11 +260,19 @@ export default function MapExperience({
         onToggleList={() => {
           setListView((value) => !value);
           setNetworkView(false);
+          setPatternsView(false);
         }}
         networkView={networkView}
         onToggleNetwork={() => {
           setNetworkView((value) => !value);
           setListView(false);
+          setPatternsView(false);
+        }}
+        patternsView={patternsView}
+        onTogglePatterns={() => {
+          setPatternsView((value) => !value);
+          setListView(false);
+          setNetworkView(false);
         }}
       />
 
@@ -241,17 +280,30 @@ export default function MapExperience({
         showOsm={showOsm}
         showWikidata={showWikidata}
         showProcurement={showProcurement}
+        showNasa={showNasa}
+        showFacilities={showFacilities}
         onToggleOsm={() => setShowOsm((value) => !value)}
         onToggleWikidata={() => setShowWikidata((value) => !value)}
         onToggleProcurement={() => setShowProcurement((value) => !value)}
+        onToggleNasa={() => setShowNasa((value) => !value)}
+        onToggleFacilities={() => setShowFacilities((value) => !value)}
       />
 
       {listView && <RecordList records={filtered} onSelect={(record) => selectRecords([record])} />}
 
+      {patternsView && (
+        <PatternsPanel
+          records={filtered}
+          nasaEvents={nasaEvents}
+          facilities={facilities}
+          onClose={() => setPatternsView(false)}
+        />
+      )}
+
       {/* Time slider: filters the atlas layer to records known by a given year.
           Hidden in the list/network views, which have their own bottom-anchored
           panels that would collide with it on narrow screens. */}
-      {!listView && !networkView && (
+      {!listView && !networkView && !patternsView && (
         <TimeSlider
           value={filters.year}
           onChange={(year) => setFilters((f) => ({ ...f, year }))}
