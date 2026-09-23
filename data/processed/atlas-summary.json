@@ -1,19 +1,19 @@
 {
-  "generatedAt": "2026-09-16T10:07:08.760Z",
-  "totalRecords": 15155,
+  "generatedAt": "2026-09-23T10:09:59.155Z",
+  "totalRecords": 15103,
   "skippedNoLocation": 22,
   "skippedNoEvidence": 10,
   "geocodeSources": {
     "csv": 0,
-    "city": 13184,
-    "county": 1846,
+    "city": 13139,
+    "county": 1839,
     "state": 125
   },
-  "uniqueAgencies": 7748,
+  "uniqueAgencies": 7734,
   "uniqueTechnologies": 12,
   "uniqueStates": 51,
-  "recordsWithYear": 14149,
-  "yearCoveragePct": 93.4,
+  "recordsWithYear": 14098,
+  "yearCoveragePct": 93.3,
   "technologies": [
     "Automated License Plate Readers",
     "Body-worn Cameras",
@@ -88,7 +88,7 @@
     },
     {
       "label": "Automated License Plate Readers",
-      "count": 4142
+      "count": 4090
     },
     {
       "label": "Drones",
@@ -126,7 +126,7 @@
   "topStates": [
     {
       "label": "CA",
-      "count": 1089
+      "count": 1084
     },
     {
       "label": "NJ",
@@ -134,23 +134,23 @@
     },
     {
       "label": "FL",
-      "count": 945
+      "count": 943
     },
     {
       "label": "TX",
-      "count": 914
+      "count": 908
     },
     {
       "label": "IL",
-      "count": 863
+      "count": 862
     },
     {
       "label": "OH",
-      "count": 836
+      "count": 833
     },
     {
       "label": "MI",
-      "count": 716
+      "count": 715
     },
     {
       "label": "TN",
@@ -158,7 +158,7 @@
     },
     {
       "label": "MA",
-      "count": 632
+      "count": 628
     },
     {
       "label": "GA",
@@ -168,7 +168,7 @@
   "topVendors": [
     {
       "label": "Flock Safety",
-      "count": 2746
+      "count": 2705
     },
     {
       "label": "Axon",
@@ -215,5 +215,5 @@
   "licenseUrl": "https://www.eff.org/copyright",
   "csvOrigin": "EFF live download",
   "live": true,
-  "sourceLastUpdated": "2026-09-16"
+  "sourceLastUpdated": "2026-09-23"
 }
