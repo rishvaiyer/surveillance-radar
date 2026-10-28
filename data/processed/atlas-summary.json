@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-21T10:22:28.780Z",
+  "generatedAt": "2026-10-28T11:27:23.974Z",
   "totalRecords": 15103,
   "skippedNoLocation": 22,
   "skippedNoEvidence": 10,
@@ -215,5 +215,5 @@
   "licenseUrl": "https://www.eff.org/copyright",
   "csvOrigin": "EFF live download",
   "live": true,
-  "sourceLastUpdated": "2026-10-21"
+  "sourceLastUpdated": "2026-10-28"
 }
