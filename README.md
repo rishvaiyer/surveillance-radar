@@ -1,6 +1,6 @@
 # Surveillance Radar
 
-An interactive, dark **3D globe** that visualizes documented law-enforcement surveillance
+An interactive **3D globe** that visualizes documented law-enforcement surveillance
 technology across the United States. Think *FlightRadar24 for surveillance tech*. Spin the
 globe, zoom in, and click glowing points to see which agencies use which technologies, with
 links back to the supporting evidence.
@@ -12,7 +12,8 @@ not affiliated with or endorsed by EFF.
 
 ## What it does
 
-- A rotatable 3D globe (MapLibre GL globe projection) on a dark starfield with a soft atmosphere.
+- A rotatable 3D globe (MapLibre GL globe projection) on a plain dark ground with a faint rim of light.
+- **What is near me?** Type a city or share your location and see every documented deployment within 10, 25 or 50 miles, by technology, closest first. Your position is used in the browser only and is never sent anywhere. Places are the agency's city or county, never a street address.
 - Glowing, clustered points for each surveillance record; clusters expand as you zoom in.
 - Click a point to fly in and open a detail drawer: agency, location, technology, vendor,
   description, and **evidence links**.

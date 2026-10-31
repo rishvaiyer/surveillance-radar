@@ -60,7 +60,7 @@ export default function PatternsPanel({
 
       <div className="mt-4 grid gap-4 md:grid-cols-2">
         <Chart title="Top technologies" note="Documented EFF records">
-          <Bars bars={analysis.technologies} color="#38e1ff" />
+          <Bars bars={analysis.technologies} color="#ff6a4d" />
         </Chart>
         <Chart title="NASA event categories" note="Current EONET snapshot">
           <Bars bars={analysis.nasaCategories} color="#ff8a3d" />
@@ -86,7 +86,7 @@ export default function PatternsPanel({
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <CompareCard
             title="EFF Atlas"
-            color="#38e1ff"
+            color="#ff6a4d"
             rows={[
               ["Filtered records", analysis.recordCount.toLocaleString()],
               ["States represented", analysis.stateCount.toLocaleString()],
