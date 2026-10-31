@@ -106,6 +106,7 @@ export default function Globe({
   showNasa,
   showFacilities,
   onCountryClick,
+  focus,
 }: {
   records: MapRecord[];
   onSelect: (records: MapRecord[]) => void;
@@ -115,6 +116,7 @@ export default function Globe({
   showNasa: boolean;
   showFacilities: boolean;
   onCountryClick: (country: ClickedCountry) => void;
+  focus?: { lat: number; lon: number; zoom: number; key: number } | null;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MLMap | null>(null);
@@ -159,7 +161,7 @@ export default function Globe({
       try {
         map.setSky({
           "sky-color": THEME.atmosphere,
-          "horizon-color": "#0b2036",
+          "horizon-color": "#1f1b14",
           "fog-color": THEME.space,
           "sky-horizon-blend": 0.5,
           "horizon-fog-blend": 0.5,
@@ -187,8 +189,8 @@ export default function Globe({
         paint: {
           "circle-color": THEME.cluster,
           "circle-blur": 1,
-          "circle-opacity": 0.35,
-          "circle-radius": ["step", ["get", "point_count"], 18, 10, 26, 50, 36],
+          "circle-opacity": 0.14,
+          "circle-radius": ["step", ["get", "point_count"], 14, 10, 20, 50, 28],
         },
       });
 
@@ -227,8 +229,8 @@ export default function Globe({
         filter: ["has", "point_count"],
         paint: {
           "circle-color": THEME.cluster,
-          "circle-opacity": 0.9,
-          "circle-radius": ["step", ["get", "point_count"], 12, 10, 18, 50, 26],
+          "circle-opacity": 0.6,
+          "circle-radius": ["step", ["get", "point_count"], 9, 10, 14, 50, 21],
           "circle-stroke-color": THEME.pointBright,
           "circle-stroke-width": 1,
         },
@@ -272,7 +274,7 @@ export default function Globe({
         paint: {
           "circle-color": TECH_COLOR,
           "circle-radius": 4,
-          "circle-stroke-color": "#eafcff",
+          "circle-stroke-color": "#fff1e6",
           "circle-stroke-width": 1.2,
         },
       });
@@ -658,6 +660,23 @@ export default function Globe({
     set("peeringdb-glow", showFacilities);
     set("peeringdb-core", showFacilities);
   }, [showOsm, showWikidata, showProcurement, showNasa, showFacilities, ready]);
+
+  // Fly to a place on request (near me, a picked record), and stop the idle spin so it stays put.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !ready || !focus) return;
+    setSpinning(false);
+    map.easeTo({ center: [focus.lon, focus.lat], zoom: focus.zoom, duration: REDUCED_MOTION ? 0 : 1400 });
+  }, [focus, ready]);
+
+  // The expanding "radar ping" rings were decoration; keep the layers out of sight.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !ready) return;
+    for (const id of ["point-ping-a", "point-ping-b"]) {
+      if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", "none");
+    }
+  }, [ready]);
 
   // Keep the GeoJSON source in sync with filtered records.
   useEffect(() => {

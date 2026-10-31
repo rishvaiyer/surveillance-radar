@@ -6,9 +6,14 @@ html,
 body {
   height: 100%;
   margin: 0;
-  background: #05070d;
-  color: #dbe6f2;
+  background: #12100c;
+  color: #efe6d4;
   overscroll-behavior: none;
+}
+
+::selection {
+  background: #ff6a4d;
+  color: #1a0b07;
 }
 
 /* MapLibre canvas should fill its container with no focus ring */
@@ -22,123 +27,100 @@ body {
   display: none !important;
 }
 
+/* ---- Plain labels ----
+   Small labels used to be tracked, upper-cased and monospaced. They are now sentence-case text in
+   the same typeface as everything else. */
+.uppercase {
+  text-transform: none !important;
+}
+[class*="tracking-"] {
+  letter-spacing: 0 !important;
+}
+
 /* ---- Themed MapLibre popup (overrides the default white bubble) ---- */
 .maplibregl-popup-content {
-  background: rgba(10, 16, 26, 0.92) !important;
-  border: 1px solid rgba(56, 225, 255, 0.35);
-  border-radius: 10px;
-  padding: 10px 12px !important;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55), 0 0 18px rgba(56, 225, 255, 0.12);
-  backdrop-filter: blur(6px);
-  color: #dbe6f2;
+  background: #1b1812 !important;
+  border: 1px solid #3b352a;
+  border-radius: 14px;
+  padding: 12px 14px !important;
+  box-shadow: 0 18px 40px -16px rgba(0, 0, 0, 0.75);
+  color: #efe6d4;
 }
 .maplibregl-popup-tip {
-  border-top-color: rgba(10, 16, 26, 0.92) !important;
-  border-bottom-color: rgba(10, 16, 26, 0.92) !important;
+  border-top-color: #1b1812 !important;
+  border-bottom-color: #1b1812 !important;
 }
 .sr-popup {
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 11px;
-  line-height: 1.5;
-  color: #dbe6f2;
-  min-width: 150px;
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #efe6d4;
+  min-width: 160px;
 }
 .sr-popup .sr-popup-title {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  gap: 8px;
+  font-weight: 650;
 }
 .sr-popup .sr-chip {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
   border-radius: 999px;
-  box-shadow: 0 0 8px currentColor;
   flex: none;
 }
 .sr-popup .sr-sub {
   margin-top: 3px;
-  color: #9fb0c6;
+  color: #c9bfa9;
 }
 .sr-popup .sr-attr {
-  margin-top: 4px;
-  color: #5b6a80;
-  font-size: 10px;
+  margin-top: 6px;
+  color: #8a8270;
+  font-size: 11px;
 }
 
-/* MapLibre navigation control, retinted to match the HUD. */
+/* MapLibre navigation control, retinted to match. */
 .maplibregl-ctrl-group {
-  background: rgba(11, 15, 24, 0.8) !important;
-  border: 1px solid #1b2433 !important;
-  backdrop-filter: blur(6px);
+  background: #1b1812 !important;
+  border: 1px solid #3b352a !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+  overflow: hidden;
 }
 .maplibregl-ctrl-group button + button {
-  border-top: 1px solid #1b2433 !important;
+  border-top: 1px solid #322d23 !important;
 }
 .maplibregl-ctrl button .maplibregl-ctrl-icon {
-  filter: invert(0.85) hue-rotate(160deg) brightness(1.1);
+  filter: invert(0.88) sepia(0.25);
 }
 
-/* ---- Radar sweep overlay (full-scene, rotating conic gradient) ---- */
-.radar-sweep {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 150vmax;
-  height: 150vmax;
-  transform-origin: center;
-  translate: -50% -50%;
-  border-radius: 50%;
-  pointer-events: none;
-  background: conic-gradient(
-    from 0deg,
-    rgba(56, 225, 255, 0) 0deg,
-    rgba(56, 225, 255, 0) 300deg,
-    rgba(56, 225, 255, 0.05) 344deg,
-    rgba(122, 240, 255, 0.16) 358deg,
-    rgba(154, 240, 255, 0.28) 360deg
-  );
-  mix-blend-mode: screen;
-  opacity: 0.7;
-}
-
-/* ---- Faint scope grid + vignette over the whole scene ---- */
-.scope-vignette {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(120% 120% at 50% 42%, rgba(5, 7, 13, 0) 42%, rgba(5, 7, 13, 0.55) 100%),
-    radial-gradient(60% 60% at 50% 42%, rgba(63, 143, 214, 0.06) 0%, rgba(5, 7, 13, 0) 70%);
-}
-
-/* HUD corner-tick accent used on panels. */
+/* Panels: solid ink, one hairline, a quiet shadow. */
 .hud-panel {
-  background: linear-gradient(180deg, rgba(15, 21, 33, 0.86) 0%, rgba(9, 13, 21, 0.82) 100%);
-  border: 1px solid #1b2433;
-  box-shadow: inset 0 1px 0 rgba(56, 225, 255, 0.06), 0 8px 30px rgba(0, 0, 0, 0.35);
-}
-.hud-panel::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 1px;
-  background: linear-gradient(90deg, rgba(56, 225, 255, 0) 0%, rgba(56, 225, 255, 0.5) 50%, rgba(56, 225, 255, 0) 100%);
+  background: rgba(27, 24, 18, 0.94);
+  border: 1px solid #322d23;
+  border-radius: 16px;
+  box-shadow: 0 18px 40px -22px rgba(0, 0, 0, 0.8);
 }
 
 .scrollbar-thin::-webkit-scrollbar {
   width: 8px;
 }
 .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: #1b2433;
+  background: #3b352a;
   border-radius: 8px;
 }
 
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #ff6a4d;
+  outline-offset: 2px;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .radar-sweep {
+  * {
     animation: none !important;
+    transition: none !important;
   }
 }

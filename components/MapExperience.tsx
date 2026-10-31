@@ -5,7 +5,6 @@ import Globe from "./map/Globe";
 import Controls from "./map/Controls";
 import RecordDrawer from "./map/RecordDrawer";
 import Legend from "./map/Legend";
-import Starfield from "./map/Starfield";
 import StatHud from "./hud/StatHud";
 import Footer from "./layout/Footer";
 import RecordList from "./map/RecordList";
@@ -14,6 +13,8 @@ import LayerToggles from "./map/LayerToggles";
 import TimeSlider from "./map/TimeSlider";
 import CountryPanel from "./map/CountryPanel";
 import PatternsPanel from "./PatternsPanel";
+import NearMe, { type Place } from "./map/NearMe";
+import Intro from "./hud/Intro";
 import { applyFilters, EMPTY_FILTERS, type Filters } from "../lib/atlas/filters";
 import type { MapRecord } from "../lib/atlas/schema";
 import type { ClickedCountry } from "../lib/geo/countryLookup";
@@ -88,6 +89,11 @@ export default function MapExperience({
   const [wikidataFeatures, setWikidataFeatures] = useState<PointFeature[]>([]);
   const [nasaEvents, setNasaEvents] = useState<NasaEvent[]>([]);
   const [facilities, setFacilities] = useState<FacilityFeature[]>([]);
+  // "What is near me?": the place, radius and a camera nudge for the globe.
+  const [nearOpen, setNearOpen] = useState(false);
+  const [place, setPlace] = useState<Place | null>(null);
+  const [radius, setRadius] = useState(25);
+  const [focus, setFocus] = useState<{ lat: number; lon: number; zoom: number; key: number } | null>(null);
 
   const filtered = useMemo(() => applyFilters(records, filters), [records, filters]);
   const yearCoverage = useMemo(() => {
@@ -175,7 +181,10 @@ export default function MapExperience({
   }, [records]);
 
   const selectRecords = (next: MapRecord[] | null) => {
-    if (next) setSelectedCountry(null); // the two side panels are mutually exclusive
+    if (next) {
+      setSelectedCountry(null); // the side panels are mutually exclusive
+      setNearOpen(false);
+    }
     setSelected(next);
     const url = new URL(window.location.href);
     if (next?.length === 1) url.searchParams.set("record", next[0].id);
@@ -185,7 +194,23 @@ export default function MapExperience({
 
   const handleCountryClick = (country: ClickedCountry) => {
     selectRecords(null); // close the record drawer (and its ?record= param) first
+    setNearOpen(false);
     setSelectedCountry(country);
+  };
+
+  const openNearMe = () => {
+    selectRecords(null);
+    setSelectedCountry(null);
+    setNearOpen(true);
+  };
+  const choosePlace = (next: Place) => {
+    setPlace(next);
+    const zoom = radius <= 10 ? 9.5 : radius <= 25 ? 8.5 : 7.5;
+    setFocus({ lat: next.lat, lon: next.lon, zoom, key: Date.now() });
+  };
+  const changeRadius = (miles: number) => {
+    setRadius(miles);
+    if (place) setFocus({ lat: place.lat, lon: place.lon, zoom: miles <= 10 ? 9.5 : miles <= 25 ? 8.5 : 7.5, key: Date.now() });
   };
 
   return (
@@ -200,15 +225,9 @@ export default function MapExperience({
         showNasa={showNasa}
         showFacilities={showFacilities}
         onCountryClick={handleCountryClick}
+        focus={focus}
       />
 
-      {/* Atmospheric overlays: stars, rotating radar sweep, scope vignette (above the
-          globe, below the UI panels). */}
-      <Starfield />
-      <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
-        <div className="radar-sweep animate-radar-sweep" />
-      </div>
-      <div className="scope-vignette z-10" />
       {networkView && (
         <AlprNetwork
           records={filtered.filter((record) => Boolean(record.alprEvidence))}
@@ -218,22 +237,25 @@ export default function MapExperience({
 
       {/* Top bar */}
       <header className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-4 p-4">
-        <div className="pointer-events-auto">
-          <div className="flex items-baseline gap-3">
-            <span className="flex items-center gap-2 font-display text-lg font-medium tracking-tight text-signal">
-            <span className="relative inline-flex h-4 w-4 items-center justify-center">
-              <span className="absolute inset-0 rounded-full border border-signal/50" />
-              <span className="h-1.5 w-1.5 rounded-full bg-signal shadow-[0_0_8px_#38e1ff]" />
-            </span>
-              Surveillance Radar
-            </span>
-            <span className="hidden font-mono text-[12px] text-muted lg:inline">
-              Documented law-enforcement surveillance · EFF Atlas of Surveillance
-            </span>
+        <div className="pointer-events-auto max-w-[34rem]">
+          <h1 className="font-display text-xl font-bold tracking-tight text-ink">
+            Surveillance <span className="text-signal">Radar</span>
+          </h1>
+          <p className="mt-1 hidden text-[13px] leading-snug text-muted md:block">
+            Every documented deployment of police surveillance technology in the United States we could find, each one linked to its evidence.
+          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
+            <button
+              type="button"
+              onClick={openNearMe}
+              className="rounded-full bg-signal px-4 py-1.5 text-[13px] font-bold text-[#1a0b07] hover:brightness-110"
+            >
+              What&apos;s near me?
+            </button>
+            <a href="/" className="text-[12px] text-muted hover:text-ink hover:underline">
+              Built by Rishva Iyer · Back to portfolio
+            </a>
           </div>
-          <a href="/" className="mt-1 inline-block font-mono text-[12px] text-muted hover:text-signal hover:underline">
-            Built by Rishva Iyer · Back to portfolio
-          </a>
         </div>
         <div className="hidden sm:block">
           <StatHud filtered={filtered.length} summary={summary} />
@@ -321,6 +343,20 @@ export default function MapExperience({
         />
       </div>
 
+      <NearMe
+        open={nearOpen}
+        onClose={() => setNearOpen(false)}
+        records={records}
+        place={place}
+        onPlace={choosePlace}
+        radius={radius}
+        onRadius={changeRadius}
+        onPick={(record) => {
+          selectRecords([record]);
+          setFocus({ lat: record.latitude, lon: record.longitude, zoom: 9, key: Date.now() });
+        }}
+      />
+
       {/* Detail drawer */}
       <RecordDrawer records={selected} onClose={() => selectRecords(null)} />
 
@@ -333,6 +369,8 @@ export default function MapExperience({
         wikidataFeatures={wikidataFeatures}
         onSelectState={(state) => setFilters((f) => ({ ...f, state }))}
       />
+
+      <Intro records={summary.totalRecords} agencies={summary.uniqueAgencies} onNearMe={openNearMe} />
 
       <Footer summary={summary} />
 

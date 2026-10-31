@@ -132,7 +132,7 @@ export default function CountryPanel({
                   <span className="relative h-2 flex-1 overflow-hidden rounded-sm bg-white/5">
                     <span
                       className="absolute inset-y-0 left-0 rounded-sm bg-signal"
-                      style={{ width: `${(count / maxState) * 100}%`, boxShadow: "0 0 8px #38e1ff" }}
+                      style={{ width: `${(count / maxState) * 100}%`, boxShadow: "0 0 8px #ff6a4d" }}
                     />
                   </span>
                   <span className="w-10 flex-none text-right font-mono text-[12px] tabular-nums text-muted">{count}</span>

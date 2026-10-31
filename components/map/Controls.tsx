@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Filters } from "../../lib/atlas/filters";
 
 export default function Controls({
@@ -29,6 +29,8 @@ export default function Controls({
   onTogglePatterns: () => void;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  // Open by default only where there is room; the globe comes first on smaller screens.
+  useEffect(() => setMobileOpen(window.innerWidth >= 1100), []);
   const set = (patch: Partial<Filters>) => onChange({ ...filters, ...patch });
   const label = "mt-3 block font-mono text-[12px] uppercase tracking-[0.14em] text-muted";
   const field =
@@ -39,15 +41,15 @@ export default function Controls({
       <button
         type="button"
         onClick={() => setMobileOpen((value) => !value)}
-        className={`hud-panel absolute left-4 z-30 rounded-lg border border-edge px-4 py-2 font-mono text-xs text-signal backdrop-blur sm:hidden ${networkView ? "top-44" : "top-20"}`}
+        className={`hud-panel absolute left-4 z-30 rounded-lg border border-edge px-4 py-2 text-[13px] font-semibold text-ink backdrop-blur ${networkView ? "top-44" : "top-20 sm:top-[8.5rem]"}`}
         aria-expanded={mobileOpen}
       >
-        {mobileOpen ? "Close filters" : `Search & filters · ${resultCount.toLocaleString()}`}
+        {mobileOpen ? "Hide filters" : `Filters · ${resultCount.toLocaleString()}`}
       </button>
-      <div className={`hud-panel absolute left-4 z-30 max-h-[calc(100vh-11rem)] w-[calc(100vw-2rem)] max-w-64 overflow-y-auto rounded-xl p-4 backdrop-blur sm:top-24 ${networkView ? "top-56" : "top-32"} ${mobileOpen ? "block" : "hidden sm:block"}`}>
+      <div className={`hud-panel absolute left-4 z-30 max-h-[calc(100vh-11rem)] w-[calc(100vw-2rem)] max-w-64 overflow-y-auto rounded-xl p-4 backdrop-blur sm:top-[11.75rem] ${networkView ? "top-56" : "top-32"} ${mobileOpen ? "block" : "hidden"}`}>
       <div className="mb-2 flex items-center justify-between">
-        <div className="font-mono text-[12px] uppercase tracking-[0.14em] text-muted">Filter signals</div>
-        <button type="button" onClick={() => setMobileOpen(false)} className="text-xs text-muted sm:hidden">Done</button>
+        <div className="text-[13px] font-bold text-muted">Filters</div>
+        
       </div>
       <div aria-live="polite" className="mb-2 text-xs text-signal">
         {resultCount.toLocaleString()} documented records

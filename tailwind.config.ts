@@ -5,20 +5,20 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        space: "#05070d",
-        panel: "#0b0f18",
-        edge: "#1b2433",
-        signal: "#38e1ff",
+        space: "#12100c",
+        panel: "#1b1812",
+        edge: "#322d23",
+        signal: "#ff6a4d",
         // Muted text ramp (previously scattered as hardcoded arbitrary hex).
-        ink: "#dbe6f2",
-        "ink-2": "#9fb0c6",
-        muted: "#7d8ba0",
-        faint: "#5b6a80",
+        ink: "#efe6d4",
+        "ink-2": "#c9bfa9",
+        muted: "#9d9482",
+        faint: "#6f6858",
       },
       fontFamily: {
         sans: ["var(--font-display)", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Helvetica", "Arial", "sans-serif"],
         display: ["var(--font-display)", "ui-sans-serif", "system-ui", "sans-serif"],
-        mono: ["var(--font-mono)", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
+        mono: ["var(--font-display)", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       keyframes: {
         "radar-sweep": {

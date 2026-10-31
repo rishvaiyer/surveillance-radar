@@ -83,14 +83,14 @@ export default function AlprNetwork({
       >
         <defs>
           <radialGradient id="nvlsGlow">
-            <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.38" />
-            <stop offset="100%" stopColor="#fbbf24" stopOpacity="0" />
+            <stop offset="0%" stopColor="#edb93c" stopOpacity="0.38" />
+            <stop offset="100%" stopColor="#edb93c" stopOpacity="0" />
           </radialGradient>
         </defs>
         <circle cx={CENTER_X} cy={CENTER_Y} r="160" fill="url(#nvlsGlow)" />
-        <circle cx={CENTER_X} cy={CENTER_Y} r="58" fill="#111a2b" stroke="#fbbf24" strokeWidth="1.5" />
-        <text x={CENTER_X} y={CENTER_Y - 5} textAnchor="middle" fill="#fbbf24" fontSize="15" fontWeight="600">NVLS</text>
-        <text x={CENTER_X} y={CENTER_Y + 15} textAnchor="middle" fill="#8fa2bd" fontSize="9">shared data pool</text>
+        <circle cx={CENTER_X} cy={CENTER_Y} r="58" fill="#1b1812" stroke="#edb93c" strokeWidth="1.5" />
+        <text x={CENTER_X} y={CENTER_Y - 5} textAnchor="middle" fill="#edb93c" fontSize="15" fontWeight="600">NVLS</text>
+        <text x={CENTER_X} y={CENTER_Y + 15} textAnchor="middle" fill="#9d9482" fontSize="9">shared data pool</text>
         {nodes.filter((node) => node.nvls).map((node) => (
           <line
             key={`edge-${node.record.id}`}
@@ -98,7 +98,7 @@ export default function AlprNetwork({
             y1={CENTER_Y}
             x2={node.x}
             y2={node.y}
-            stroke="#fbbf24"
+            stroke="#edb93c"
             strokeOpacity="0.12"
             strokeWidth="0.8"
           />
@@ -129,7 +129,7 @@ export default function AlprNetwork({
               cx={node.x}
               cy={node.y}
               r={node.radius}
-              fill={node.nvls ? "#fbbf24" : "#38e1ff"}
+              fill={node.nvls ? "#edb93c" : "#ff6a4d"}
               fillOpacity={hovered === node ? 1 : 0.72}
               stroke={hovered === node ? "#ffffff" : "transparent"}
               strokeWidth="1.5"
